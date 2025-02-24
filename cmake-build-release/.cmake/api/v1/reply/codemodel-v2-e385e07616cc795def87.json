@@ -49,8 +49,8 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "/Users/luna/Desktop/DA/project1_DA/cmake-build-release",
-		"source" : "/Users/luna/Desktop/DA/project1_DA"
+		"build" : "/Users/luna/Desktop/DA/projeto1/project1_DA/cmake-build-release",
+		"source" : "/Users/luna/Desktop/DA/projeto1/project1_DA"
 	},
 	"version" : 
 	{

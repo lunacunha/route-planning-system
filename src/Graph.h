@@ -45,7 +45,7 @@ public:
     void setIndegree(unsigned int indegree);
     void setDist(double dist);
     void setPath(Edge<T> *path);
-    Edge<T> * addEdge(Vertex<T> *dest, double w);
+    Edge<T> * addEdge(Vertex<T> *dest, double driving, double walking);
     bool removeEdge(T in);
     void removeOutgoingEdges();
 
@@ -157,8 +157,8 @@ Vertex<T>::Vertex(T in): info(in) {}
  * with a given destination vertex (d) and edge weight (w).
  */
 template <class T>
-Edge<T> * Vertex<T>::addEdge(Vertex<T> *d, double w) {
-    auto newEdge = new Edge<T>(this, d, w);
+Edge<T> * Vertex<T>::addEdge(Vertex<T> *d, double driving, double walking) {
+    auto newEdge = new Edge<T>(this, d, driving, walking);
     adj.push_back(newEdge);
     d->incoming.push_back(newEdge);
     return newEdge;
@@ -445,6 +445,7 @@ bool Graph<T>::addEdge(const T &sourc, const T &dest, double drive, double walk)
     auto v2 = findVertex(dest);
     if (v1 == nullptr || v2 == nullptr)
         return false;
+    v1->addEdge(v2, drive, walk);
     v1->addEdge(v2, drive, walk);
     return true;
 }

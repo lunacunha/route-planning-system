@@ -1,4 +1,4 @@
-# Install script for directory: /Users/luna/Desktop/DA/project1_DA
+# Install script for directory: /Users/luna/Desktop/DA/projeto1/project1_DA
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -45,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/Users/luna/Desktop/DA/project1_DA/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/Users/luna/Desktop/DA/projeto1/project1_DA/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

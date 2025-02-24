@@ -1,9 +1,12 @@
 # ninja log v5
-0	91	1740410318615372313	build.ninja	71cb13cf22380306
-52	1209	1740410246608123453	CMakeFiles/untitled.dir/src/Location.cpp.o	6bac7e3d67088cdc
-52	1572	1740410246972521876	CMakeFiles/untitled.dir/main.cpp.o	f4508aa9aac42b12
-835	906	1740410010760709760	untitled	f891859a930bdddb
-53	123	1740410245527147117	CMakeFiles/untitled.dir/src/Menu.cpp.o	d5dc59d5d1665b12
-20	68	1740410321297021743	CMakeFiles/untitled.dir/src/Menu.cpp.o	1a730abef5571b0c
+0	91	1740411004609190050	build.ninja	71cb13cf22380306
 19	1055	1740410322266010025	CMakeFiles/untitled.dir/src/Location.cpp.o	676b56e9dfcaed2e
 19	1401	1740410322626839196	CMakeFiles/untitled.dir/main.cpp.o	331800d2d8afc16b
+835	906	1740410010760709760	untitled	f891859a930bdddb
+20	68	1740410321297021743	CMakeFiles/untitled.dir/src/Menu.cpp.o	1a730abef5571b0c
+61	142	1740411007457803459	CMakeFiles/untitled.dir/src/Menu.cpp.o	c7570746759ce34b
+60	1568	1740411008876380671	CMakeFiles/untitled.dir/src/Location.cpp.o	b862942479854220
+60	1893	1740411009205734314	CMakeFiles/untitled.dir/main.cpp.o	fd9f3ab84ce4dc78
+16	1544	1740411086243632756	CMakeFiles/untitled.dir/main.cpp.o	fd9f3ab84ce4dc78
+17	1758	1740411086460316034	CMakeFiles/untitled.dir/src/GraphInterface.cpp.o	b47cb9d73091229e
+1758	1846	1740411086549724397	untitled	30375843f8af2c89

@@ -55,7 +55,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/Users/luna/Desktop/DA/project1_DA/cmake-build-release"
+			"value" : "/Users/luna/Desktop/DA/projeto1/project1_DA/cmake-build-release"
 		},
 		{
 			"name" : "CMAKE_CACHE_MAJOR_VERSION",
@@ -479,7 +479,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/Users/luna/Desktop/DA/project1_DA/cmake-build-release/CMakeFiles/pkgRedirects"
+			"value" : "/Users/luna/Desktop/DA/projeto1/project1_DA/cmake-build-release/CMakeFiles/pkgRedirects"
 		},
 		{
 			"name" : "CMAKE_GENERATOR",
@@ -539,7 +539,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/Users/luna/Desktop/DA/project1_DA"
+			"value" : "/Users/luna/Desktop/DA/projeto1/project1_DA"
 		},
 		{
 			"name" : "CMAKE_INSTALL_NAME_TOOL",
@@ -1111,7 +1111,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/Users/luna/Desktop/DA/project1_DA/cmake-build-release"
+			"value" : "/Users/luna/Desktop/DA/projeto1/project1_DA/cmake-build-release"
 		},
 		{
 			"name" : "untitled_IS_TOP_LEVEL",
@@ -1135,7 +1135,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/Users/luna/Desktop/DA/project1_DA"
+			"value" : "/Users/luna/Desktop/DA/projeto1/project1_DA"
 		}
 	],
 	"kind" : "cache",
