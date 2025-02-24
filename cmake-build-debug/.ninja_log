@@ -1,0 +1,9 @@
+# ninja log v5
+0	91	1740410318615372313	build.ninja	71cb13cf22380306
+52	1209	1740410246608123453	CMakeFiles/untitled.dir/src/Location.cpp.o	6bac7e3d67088cdc
+52	1572	1740410246972521876	CMakeFiles/untitled.dir/main.cpp.o	f4508aa9aac42b12
+835	906	1740410010760709760	untitled	f891859a930bdddb
+53	123	1740410245527147117	CMakeFiles/untitled.dir/src/Menu.cpp.o	d5dc59d5d1665b12
+20	68	1740410321297021743	CMakeFiles/untitled.dir/src/Menu.cpp.o	1a730abef5571b0c
+19	1055	1740410322266010025	CMakeFiles/untitled.dir/src/Location.cpp.o	676b56e9dfcaed2e
+19	1401	1740410322626839196	CMakeFiles/untitled.dir/main.cpp.o	331800d2d8afc16b
