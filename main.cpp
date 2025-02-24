@@ -11,7 +11,7 @@ int main() {
     GraphInterface graphInterface;
 
     cout << "Test parser for distances...\n";
-    graphInterface.loadDistances("\"../smallDataset/shortDistances.csv\"");
+    graphInterface.loadDistances("smallDataset/shortDistances.csv");
 
     cout << "Teste concluído.\n";
     return 0;

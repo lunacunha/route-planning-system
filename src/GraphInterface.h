@@ -23,7 +23,7 @@ private:
 public:
     GraphInterface();
 
-    //void loadLocations(const string &filename);
+    void loadLocations(const string &filename);
     void loadDistances(const string &filename);
 
     //unordered_map<string, Location*> getLocations();

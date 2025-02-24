@@ -9,7 +9,7 @@ GraphInterface::GraphInterface() {
     graph = Graph<string>(); // Inicializar o grafo
 }
 
-/*void GraphInterface::loadLocations(const string &filename) {
+void GraphInterface::loadLocations(const string &filename) {
     ifstream fileToLoad(filename);
     if (!fileToLoad.is_open()) {
         cerr << "Couldn't open file:" << filename << endl;
@@ -17,7 +17,7 @@ GraphInterface::GraphInterface() {
     }
     string line;
     getline(fileToLoad, line); // skip header line
-}*/
+}
 
 
 
@@ -46,6 +46,12 @@ void GraphInterface::loadDistances(const string &filename) {
 
             int drivingTime;
             int walkingTime;
+
+            cout << "Read line: " << line << endl;
+
+            cout << "Element[0]: " << elements[0] << ", Element[1]: " << elements[1]
+                 << ", Element[2]: " << elements[2] << ", Element[3]: " << elements[3] << endl;
+
 
             try {
                 if (elements[2] == "X") {
