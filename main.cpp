@@ -10,8 +10,8 @@ using namespace std;
 int main() {
     GraphInterface graphInterface;
 
-    cout << "Test parser for distances...\n";
-    graphInterface.loadDistances("smallDataset/shortDistances.csv");
+    cout << "Test parser for locations...\n";
+    graphInterface.loadLocations("smallDataset/shortLocations.csv");
 
     cout << "Teste concluído.\n";
     return 0;
