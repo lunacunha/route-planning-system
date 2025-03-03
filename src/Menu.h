@@ -5,9 +5,27 @@
 #ifndef PROJETO1_DA_MENU_H
 #define PROJETO1_DA_MENU_H
 
+#include "GraphInterface.h"
 
 class Menu {
+public:
+    Menu();
 
+    void init();
+
+    void drivingOnlyMenu();
+
+    void drivingWalkingMenu();
+
+    void independentRoute();
+
+    void restrictedRoute();
+
+    void bestDrivingWalkingRoute();
+
+    void approximateSolutions();
+
+    static void end();
 };
 
 
