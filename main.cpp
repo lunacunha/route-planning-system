@@ -3,16 +3,14 @@
 //
 
 #include "src/GraphInterface.h"
+#include "src/Menu.h"
 #include <iostream>
 
 using namespace std;
 
 int main() {
-    GraphInterface graphInterface;
-
-    cout << "Test parser for locations...\n";
-    graphInterface.loadLocations("smallDataset/shortLocations.csv");
-
-    cout << "Teste concluído.\n";
+    Menu menu;
+    menu.init();
+    Menu::end();
     return 0;
 }
