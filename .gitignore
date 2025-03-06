@@ -1,6 +1,7 @@
 # Ignore build directories
 /build/
 cmake-build-*/
+/cmake-build-debug/
 
 # Ignore compiled binaries
 *.exe
