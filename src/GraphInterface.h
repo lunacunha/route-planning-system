@@ -28,7 +28,9 @@ public:
 
     //unordered_map<string, Location*> getLocations();
 
-    //Graph<string> getGraph();
+    Graph<string>& getGraph() {
+        return graph;
+    }
 
     //void removeAll(); // aux function
 };

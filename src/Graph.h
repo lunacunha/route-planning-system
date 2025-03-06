@@ -446,9 +446,10 @@ bool Graph<T>::addEdge(const T &sourc, const T &dest, double drive, double walk)
     if (v1 == nullptr || v2 == nullptr)
         return false;
     v1->addEdge(v2, drive, walk);
-    v1->addEdge(v2, drive, walk);
+    v2->addEdge(v1, drive, walk);
     return true;
 }
+
 
 /*
  * Removes an edge from a graph (this).
