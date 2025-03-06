@@ -2,17 +2,18 @@
 #include <queue>
 #include <unordered_map>
 #include <limits>
+using namespace std;
 
 RoutePlanning::RoutePlanning(Graph<std::string>& graph) : graph(graph) {}
 
-std::vector<std::string> RoutePlanning::dijkstra(const std::string& source, const std::string& destination, double& totalTime) {
-  std::unordered_map<std::string, double> dist;
-  std::unordered_map<std::string, std::string> pred;
-  std::priority_queue<std::pair<double, std::string>, std::vector<std::pair<double, std::string>>, std::greater<>> pq;
+vector<string> RoutePlanning::dijkstra(const string& source, const string& destination, double& totalTime) {
+  unordered_map<string, double> dist;
+  unordered_map<string, string> pred;
+  priority_queue<pair<double, string>, vector<pair<double, string>>, greater<>> pq;
 
   // Inicializar distâncias
   for (auto vertex : graph.getVertexSet()) {
-    dist[vertex->getInfo()] = std::numeric_limits<double>::max();
+    dist[vertex->getInfo()] = numeric_limits<double>::max();
     pred[vertex->getInfo()] = "";
   }
   dist[source] = 0.0;
@@ -20,17 +21,17 @@ std::vector<std::string> RoutePlanning::dijkstra(const std::string& source, cons
 
   // Algoritmo de Dijkstra
   while (!pq.empty()) {
-    std::string u = pq.top().second;
+    string u = pq.top().second;
     double d_u = pq.top().first;
     pq.pop();
 
     if (d_u > dist[u]) continue;
 
-    Vertex<std::string>* vertex = graph.findVertex(u);
+    Vertex<string>* vertex = graph.findVertex(u);
     if (!vertex) continue;
 
     for (auto edge : vertex->getAdj()) {
-      std::string v = edge->getDest()->getInfo();
+      string v = edge->getDest()->getInfo();
       double weight = edge->getDriving(); // Usamos o tempo de condução como peso
 
       if (dist[u] + weight < dist[v]) {
@@ -42,11 +43,11 @@ std::vector<std::string> RoutePlanning::dijkstra(const std::string& source, cons
   }
 
   // Reconstruir caminho
-  std::vector<std::string> path;
-  std::string current = destination;
+  vector<string> path;
+  string current = destination;
   totalTime = dist[destination];
 
-  if (totalTime == std::numeric_limits<double>::max()) {
+  if (totalTime == numeric_limits<double>::max()) {
     return {}; // Sem caminho possível
   }
 

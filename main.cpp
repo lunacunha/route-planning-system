@@ -12,8 +12,8 @@ using namespace std;
 
 int main() {
     GraphInterface graphInterface;
-    graphInterface.loadLocations("/home/martagfmartins/Desktop/faculdade/da/project1_DA/smallDataset/shortDistances.csv");
-    graphInterface.loadDistances("/home/martagfmartins/Desktop/faculdade/da/project1_DA/smallDataset/shortLocations.csv");
+    graphInterface.loadLocations("smallDataset/shortLocations.csv");
+    graphInterface.loadDistances("smallDataset/shortDistances.csv");
 
     Graph<std::string> graph = graphInterface.getGraph();
     // Criar a classe RoutePlanning usando o grafo carregado
@@ -21,7 +21,7 @@ int main() {
 
     // Definir nós de teste
     string start = "LD3372";  // Origem
-    string end = "QTI";       // Destino
+    string end = "PR2490";       // Destino
 
     // Executar o Dijkstra
     double totalTime;  // Declaração correta da variável
