@@ -1,3 +1,4 @@
-Source:LD3372
-Destination:PR2490
-RestrictedDrivingRoute:none
+Source:A
+Destination:F
+BestDrivingRoute:A,C,D,F(5)
+AlternativeDrivingRoute:A,B,D,C,E,F(16)

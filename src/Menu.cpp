@@ -127,8 +127,8 @@ void Menu::drivingWalkingMenu() {
 void Menu::independentRoute() {
     // Load the graph
     GraphInterface graphInterface;
-    graphInterface.loadLocations("/home/martagfmartins/Desktop/faculdade/da/project1_DA/smallDataset/shortLocations.csv");
-    graphInterface.loadDistances("/home/martagfmartins/Desktop/faculdade/da/project1_DA/smallDataset/shortDistances.csv");
+    graphInterface.loadLocations("/home/martagfmartins/Desktop/faculdade/da/project1_DA/smallDataset2/smallLocations2.csv");
+    graphInterface.loadDistances("/home/martagfmartins/Desktop/faculdade/da/project1_DA/smallDataset2/smallDistances2.csv");
     Graph<string>& graph = graphInterface.getGraph();
     RoutePlanning planner(graph);
 
@@ -136,16 +136,27 @@ void Menu::independentRoute() {
     string sourceLocation, destinationLocation;
     cout << "Enter Source Location ID: ";
     cin >> sourceLocation;
+
+    // Trim spaces
+    sourceLocation.erase(0, sourceLocation.find_first_not_of(" \t\r\n"));
+    sourceLocation.erase(sourceLocation.find_last_not_of(" \t\r\n") + 1);
+
+    // Validate that only a single location ID was entered
+    if (sourceLocation.find(",") != string::npos) {
+        cout << "Error: Invalid source location format. Enter only a single location ID.\n";
+        return;
+    }
+
     cout << "Enter Destination Location ID: ";
     cin >> destinationLocation;
 
     // Trim spaces
-    sourceLocation.erase(0, sourceLocation.find_first_not_of(" \t\r\n"));
     destinationLocation.erase(0, destinationLocation.find_first_not_of(" \t\r\n"));
+    destinationLocation.erase(destinationLocation.find_last_not_of(" \t\r\n") + 1);
 
-    // Validate Source and Destination
-    if (graph.findVertex(sourceLocation) == nullptr || graph.findVertex(destinationLocation) == nullptr) {
-        cerr << "Error: Invalid source or destination!" << endl;
+    // Validate that only a single location ID was entered
+    if (destinationLocation.find(",") != string::npos) {
+        cout << "Error: Invalid destination location format. Enter only a single location ID.\n";
         return;
     }
 
@@ -220,8 +231,8 @@ void Menu::independentRoute() {
 void Menu::restrictedRoute() {
     // Load Graph
     GraphInterface graphInterface;
-    graphInterface.loadLocations("/home/martagfmartins/Desktop/faculdade/da/project1_DA/smallDataset/shortLocations.csv");
-    graphInterface.loadDistances("/home/martagfmartins/Desktop/faculdade/da/project1_DA/smallDataset/shortDistances.csv");
+    graphInterface.loadLocations("/home/martagfmartins/Desktop/faculdade/da/project1_DA/smallDataset2/smallLocations2.csv");
+    graphInterface.loadDistances("/home/martagfmartins/Desktop/faculdade/da/project1_DA/smallDataset2/smallDistances2.csv");
     Graph<string>& graph = graphInterface.getGraph();
     RoutePlanning planner(graph);
 
@@ -232,39 +243,58 @@ void Menu::restrictedRoute() {
     cout << "Enter Destination Location ID: ";
     cin >> destinationLocation;
 
+    cin.ignore();
+
     unordered_set<string> avoidNodes;
     vector<pair<string, string>> avoidSegments;
 
     // Ask user if they want to avoid nodes
     cout << "Enter nodes to avoid (comma-separated, or leave empty): ";
     string avoidNodesInput;
-    cin.ignore();
     getline(cin, avoidNodesInput);
 
-    if (!avoidNodesInput.empty()) {
-        istringstream ss(avoidNodesInput);
-        string node;
-        while (getline(ss, node, ',')) {
-            avoidNodes.insert(node);
-        }
+    // Validate avoidNodes format: No parentheses allowed, only commas
+    if (!avoidNodesInput.empty() && (avoidNodesInput.find("(") != string::npos || avoidNodesInput.find(")") != string::npos)) {
+        cout << "Error: Invalid format for avoidNodes. Use comma-separated values without parentheses.\n";
+        return; // Exit function and ask for input again
+    }
+
+    // Process avoidNodes input (only if it's valid)
+    istringstream avoidNodesStream(avoidNodesInput);
+    string node;
+    while (getline(avoidNodesStream, node, ',')) {
+        avoidNodes.insert(node);
     }
 
     // Ask user if they want to avoid segments
     cout << "Enter segments to avoid in format (id,id),(id,id) or leave empty: ";
     string avoidSegmentsInput;
     getline(cin, avoidSegmentsInput);
-
     if (!avoidSegmentsInput.empty()) {
+        if (avoidSegmentsInput.find("(") == string::npos || avoidSegmentsInput.find(")") == string::npos) {
+            cout << "Error: Invalid format for segments. Use (id,id),(id,id).\n";
+            return; // Exit function
+        }
+
         size_t pos = 0;
         while ((pos = avoidSegmentsInput.find("(")) != string::npos) {
             size_t endPos = avoidSegmentsInput.find(")");
+            if (endPos == string::npos) {
+                cout << "Error: Invalid format for segments. Ensure each segment is in (id,id) format.\n";
+                return;
+            }
             string segment = avoidSegmentsInput.substr(pos + 1, endPos - pos - 1);
             size_t commaPos = segment.find(",");
-            if (commaPos != string::npos) {
-                string from = segment.substr(0, commaPos);
-                string to = segment.substr(commaPos + 1);
-                avoidSegments.emplace_back(from, to);
+
+            if (commaPos == string::npos) {
+                cout << "Error: Invalid segment format. Each segment must be (id,id).\n";
+                return;
             }
+
+            string from = segment.substr(0, commaPos);
+            string to = segment.substr(commaPos + 1);
+            avoidSegments.emplace_back(from, to);
+
             avoidSegmentsInput.erase(0, endPos + 1);
         }
     }
@@ -272,6 +302,16 @@ void Menu::restrictedRoute() {
     // Ask for an include node
     cout << "Enter a mandatory node to include (or leave empty): ";
     getline(cin, includeNode);
+
+    // Trim spaces
+    includeNode.erase(0, includeNode.find_first_not_of(" \t\r\n"));
+    includeNode.erase(includeNode.find_last_not_of(" \t\r\n") + 1);
+
+    // Validate includeNode: It must be a single node (no commas)
+    if (!includeNode.empty() && includeNode.find(",") != string::npos) {
+        cout << "Error: Invalid format for node. Only enter a single node ID or leave empty.\n";
+        return;
+    }
 
     // Run restricted route planning
     double totalTravelTime;
