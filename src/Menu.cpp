@@ -8,6 +8,7 @@
 #include "Graph.h"
 #include <fstream>
 #include "RoutePlanning.h"
+#include "DrivingWalkingRoutePlanning.h"
 #include "Menu.h"
 #include "GraphInterface.h"
 using namespace std;
@@ -354,13 +355,210 @@ void Menu::restrictedRoute() {
 
 
 void Menu::bestDrivingWalkingRoute() {
-    cout << "Best Route for Driving & Walking selected." << endl;
-    // Chamar a função correspondente quando implementada
+    GraphInterface graphInterface;
+    
+    graphInterface.loadLocations("path/to/your/locations.csv");
+    graphInterface.loadDistances("path/to/your/distances.csv");
+    Graph<string>& graph = graphInterface.getGraph();
+    const unordered_map<string, bool>& parkingInfo = graphInterface.getParkingInfo();
+    
+    DrivingWalkingRoutePlanning dwPlanner(graph, parkingInfo);
+    
+    string source, destination;
+    int maxWalkTime;
+    unordered_set<string> avoidNodes;
+    vector<pair<string, string>> avoidSegments;
+    
+    cout << "Enter Source Location ID: ";
+    cin >> source;
+    cout << "Enter Destination Location ID: ";
+    cin >> destination;
+    cout << "Enter Maximum Walking Time: ";
+    cin >> maxWalkTime;
+    cin.ignore(); // Clear newline
+    
+    cout << "Enter avoid nodes (comma separated, or leave empty): ";
+    string avoidNodesInput;
+    getline(cin, avoidNodesInput);
+    if (!avoidNodesInput.empty()) {
+        istringstream iss(avoidNodesInput);
+        string token;
+        while(getline(iss, token, ',')) {
+            avoidNodes.insert(token);
+        }
+    }
+    
+    cout << "Enter avoid segments (format: (id,id),(id,id) or leave empty): ";
+    string avoidSegmentsInput;
+    getline(cin, avoidSegmentsInput);
+    if (!avoidSegmentsInput.empty()) {
+        size_t pos = 0;
+        while ((pos = avoidSegmentsInput.find("(")) != string::npos) {
+            size_t endPos = avoidSegmentsInput.find(")", pos);
+            if (endPos == string::npos)
+                break;
+            string segment = avoidSegmentsInput.substr(pos + 1, endPos - pos - 1);
+            size_t commaPos = segment.find(",");
+            if (commaPos != string::npos) {
+                string from = segment.substr(0, commaPos);
+                string to = segment.substr(commaPos + 1);
+                avoidSegments.push_back({from, to});
+            }
+            avoidSegmentsInput.erase(0, endPos + 1);
+        }
+    }
+    
+    string errorMessage;
+    auto route = dwPlanner.findBestRoute(source, destination, maxWalkTime, avoidNodes, avoidSegments, errorMessage);
+    
+    cout << "\n===== Driving & Walking Route Results =====" << endl;
+    cout << "Source:" << source << endl;
+    cout << "Destination:" << destination << endl;
+    if (route.drivingRoute.empty() || route.walkingRoute.empty() || route.parkingNode.empty()) {
+        cout << "DrivingRoute:none" << endl;
+        cout << "ParkingNode:none" << endl;
+        cout << "WalkingRoute:none" << endl;
+        cout << "TotalTime:" << endl;
+        cout << "Message:" << errorMessage << endl;
+    } else {
+        cout << "DrivingRoute:";
+        for (size_t i = 0; i < route.drivingRoute.size(); i++) {
+            cout << route.drivingRoute[i];
+            if (i < route.drivingRoute.size() - 1)
+                cout << ",";
+        }
+        cout << "(" << route.drivingTime << ")" << endl;
+        
+        cout << "ParkingNode:" << route.parkingNode << endl;
+        
+        cout << "WalkingRoute:";
+        for (size_t i = 0; i < route.walkingRoute.size(); i++) {
+            cout << route.walkingRoute[i];
+            if (i < route.walkingRoute.size() - 1)
+                cout << ",";
+        }
+        cout << "(" << route.walkingTime << ")" << endl;
+        
+        cout << "TotalTime:" << "(" << route.totalTime << ")" << endl;
+    }
+    
+    // Write results to output file.
+    ofstream outputFile("output.txt", ios::trunc);
+    if (outputFile.is_open()) {
+        outputFile << "Source:" << source << "\n";
+        outputFile << "Destination:" << destination << "\n";
+        if (route.drivingRoute.empty() || route.walkingRoute.empty() || route.parkingNode.empty()) {
+            outputFile << "DrivingRoute:none\n";
+            outputFile << "ParkingNode:none\n";
+            outputFile << "WalkingRoute:none\n";
+            outputFile << "TotalTime:\n";
+            outputFile << "Message:" << errorMessage << "\n";
+        } else {
+            outputFile << "DrivingRoute:";
+            for (size_t i = 0; i < route.drivingRoute.size(); i++) {
+                outputFile << route.drivingRoute[i];
+                if (i < route.drivingRoute.size() - 1)
+                    outputFile << ",";
+            }
+            outputFile << "(" << route.drivingTime << ")\n";
+            outputFile << "ParkingNode:" << route.parkingNode << "\n";
+            outputFile << "WalkingRoute:";
+            for (size_t i = 0; i < route.walkingRoute.size(); i++) {
+                outputFile << route.walkingRoute[i];
+                if (i < route.walkingRoute.size() - 1)
+                    outputFile << ",";
+            }
+            outputFile << "(" << route.walkingTime << ")\n";
+            outputFile << "TotalTime:" << "(" << route.totalTime << ")\n";
+        }
+        outputFile.close();
+        cout << "Results written to output.txt" << endl;
+    }
 }
 
 void Menu::approximateSolutions() {
     cout << "Approximate Solutions selected." << endl;
-    // Chamar a função correspondente quando implementada
+    GraphInterface graphInterface;
+    
+    graphInterface.loadLocations("path/to/your/locations.csv");
+    graphInterface.loadDistances("path/to/your/distances.csv");
+    Graph<string>& graph = graphInterface.getGraph();
+    const unordered_map<string, bool>& parkingInfo = graphInterface.getParkingInfo();
+    
+    DrivingWalkingRoutePlanning dwPlanner(graph, parkingInfo);
+    
+    
+    string source, destination;
+    int maxWalkTime;
+    unordered_set<string> avoidNodes;
+    vector<pair<string, string>> avoidSegments;
+    
+    cout << "Enter Source Location ID: ";
+    cin >> source;
+    cout << "Enter Destination Location ID: ";
+    cin >> destination;
+    cout << "Enter Maximum Walking Time: ";
+    cin >> maxWalkTime;
+    cin.ignore();
+    
+    cout << "Enter avoid nodes (comma separated, or leave empty): ";
+    string avoidNodesInput;
+    getline(cin, avoidNodesInput);
+    if (!avoidNodesInput.empty()) {
+        istringstream iss(avoidNodesInput);
+        string token;
+        while(getline(iss, token, ',')) {
+            avoidNodes.insert(token);
+        }
+    }
+    
+    cout << "Enter avoid segments (format: (id,id),(id,id) or leave empty): ";
+    string avoidSegmentsInput;
+    getline(cin, avoidSegmentsInput);
+    if (!avoidSegmentsInput.empty()) {
+        size_t pos = 0;
+        while ((pos = avoidSegmentsInput.find("(")) != string::npos) {
+            size_t endPos = avoidSegmentsInput.find(")", pos);
+            if (endPos == string::npos)
+                break;
+            string segment = avoidSegmentsInput.substr(pos + 1, endPos - pos - 1);
+            size_t commaPos = segment.find(",");
+            if (commaPos != string::npos) {
+                string from = segment.substr(0, commaPos);
+                string to = segment.substr(commaPos + 1);
+                avoidSegments.push_back({from, to});
+            }
+            avoidSegmentsInput.erase(0, endPos + 1);
+        }
+    }
+    
+    auto alternatives = dwPlanner.findApproximateRoutes(source, destination, maxWalkTime, avoidNodes, avoidSegments);
+    cout << "\n===== Approximate Routes =====" << endl;
+    if (alternatives.empty()) {
+        cout << "No approximate routes found." << endl;
+    } else {
+        for (size_t i = 0; i < alternatives.size(); i++) {
+            cout << "DrivingRoute" << i+1 << ":";
+            for (size_t j = 0; j < alternatives[i].drivingRoute.size(); j++) {
+                cout << alternatives[i].drivingRoute[j];
+                if (j < alternatives[i].drivingRoute.size() - 1)
+                    cout << ",";
+            }
+            cout << "(" << alternatives[i].drivingTime << ")" << endl;
+            
+            cout << "ParkingNode" << i+1 << ":" << alternatives[i].parkingNode << endl;
+            
+            cout << "WalkingRoute" << i+1 << ":";
+            for (size_t j = 0; j < alternatives[i].walkingRoute.size(); j++) {
+                cout << alternatives[i].walkingRoute[j];
+                if (j < alternatives[i].walkingRoute.size() - 1)
+                    cout << ",";
+            }
+            cout << "(" << alternatives[i].walkingTime << ")" << endl;
+            
+            cout << "TotalTime" << i+1 << ":" << "(" << alternatives[i].totalTime << ")" << endl;
+        }
+    }
 }
 
 void Menu::end() {

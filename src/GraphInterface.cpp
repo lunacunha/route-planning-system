@@ -49,6 +49,7 @@ void GraphInterface::loadLocations(const string &filename) {
         hasParking = (elements[3] == "1");
 
         graph.addVertex(locationCode);
+        parkingInfo[locationCode] = hasParking;
     }
 }
 
