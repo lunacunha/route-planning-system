@@ -19,6 +19,7 @@ class GraphInterface {
 
 private:
     Graph<string> graph;
+    unordered_map<string, bool> parkingInfo;
 
 public:
     GraphInterface();
@@ -30,6 +31,10 @@ public:
 
     Graph<string>& getGraph() {
         return graph;
+    }
+
+    const unordered_map<string, bool>& getParkingInfo() const {
+        return parkingInfo;
     }
 
     //void removeAll(); // aux function
