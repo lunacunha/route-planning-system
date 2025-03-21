@@ -14,5 +14,7 @@ add_executable(untitled
         src/MutablePriorityQueue.h
         src/RoutePlanning.cpp
         src/RoutePlanning.h
+        src/DrivingWalkingRoutePlanning.h
+        src/DrivingWalkingRoutePlanning.cpp
 
 )

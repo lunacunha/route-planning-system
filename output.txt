@@ -1,4 +1,7 @@
-Source:A
-Destination:F
-BestDrivingRoute:A,C,D,F(5)
-AlternativeDrivingRoute:A,B,D,C,E,F(16)
+Source:2
+Destination:1
+DrivingRoute:none
+ParkingNode:none
+WalkingRoute:none
+TotalTime:
+Message:Source or destination does not exist.
