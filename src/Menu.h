@@ -26,6 +26,10 @@ public:
     void approximateSolutions();
 
     static void end();
+
+    static string toUpper(const std::string &s);
+
+    static string trim(const string &s);
 };
 
 

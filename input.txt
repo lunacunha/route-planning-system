@@ -1,3 +1,6 @@
-Mode:driving
-Source:A
-Destination:F
+Mode:driving-walking
+Source:B
+Destination:H
+MaxWalkTime:40
+AvoidNodes:
+AvoidSegments:

@@ -235,6 +235,18 @@ vector<string> RoutePlanning::findRestrictedRoute(const string& sourceLocation, 
                 }
             }
         }
+
+
+        Vertex<string>* v2 = graph.findVertex(segment.second);
+        if (v2) {
+            for (const auto edge : v2->getAdj()) {
+                if (edge->getDest()->getInfo() == segment.first) {
+                    removedEdges.push_back(make_tuple(segment.second, segment.first, edge->getDriving(), edge->getWalking()));
+                    graph.removeEdge(segment.second, segment.first);
+                    break;
+                }
+            }
+        }
     }
 
     vector<string> finalRoute;

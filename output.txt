@@ -1,7 +1,6 @@
-Source:2
-Destination:1
-DrivingRoute:none
-ParkingNode:none
-WalkingRoute:none
-TotalTime:
-Message:Source or destination does not exist.
+Source:B
+Destination:H
+DrivingRoute:B,A,C,E,G(10)
+ParkingNode:G
+WalkingRoute:G,H(8)
+TotalTime:(18)

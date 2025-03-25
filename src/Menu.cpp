@@ -1,17 +1,30 @@
-//
-// Created by Luna on 22/02/2025.
-//
-
-#include <string>
-#include <iostream>
-#include "GraphInterface.h"
-#include "Graph.h"
-#include <fstream>
-#include "RoutePlanning.h"
-#include "DrivingWalkingRoutePlanning.h"
+// Menu.cpp
 #include "Menu.h"
 #include "GraphInterface.h"
+#include "RoutePlanning.h"
+#include "DrivingWalkingRoutePlanning.h"
+#include "InputValidation.h" // Contém as funções auxiliares de validação
+#include <fstream>
+#include <sstream>
+#include <algorithm>
+#include <cctype>
+#include <iostream>
+#include <cmath>
 using namespace std;
+
+string Menu::trim(const string &s) {
+    size_t start = s.find_first_not_of(" \t\r\n");
+    size_t end = s.find_last_not_of(" \t\r\n");
+    return (start == string::npos || end == string::npos) ? "" : s.substr(start, end - start + 1);
+}
+
+// Função auxiliar para converter uma string para uppercase.
+string Menu::toUpper(const string &s) {
+    string result = s;
+    transform(result.begin(), result.end(), result.begin(),
+              [](unsigned char c) { return toupper(c); });
+    return result;
+}
 
 Menu::Menu() {
     string inp;
@@ -137,100 +150,107 @@ void Menu::independentRoute() {
     string sourceLocation, destinationLocation;
     cout << "Enter Source Location ID: ";
     cin >> sourceLocation;
-
-    // Trim spaces
-    sourceLocation.erase(0, sourceLocation.find_first_not_of(" \t\r\n"));
-    sourceLocation.erase(sourceLocation.find_last_not_of(" \t\r\n") + 1);
-
-    // Validate that only a single location ID was entered
-    if (sourceLocation.find(",") != string::npos) {
-        cout << "Error: Invalid source location format. Enter only a single location ID.\n";
-        return;
-    }
-
     cout << "Enter Destination Location ID: ";
     cin >> destinationLocation;
 
-    // Trim spaces
-    destinationLocation.erase(0, destinationLocation.find_first_not_of(" \t\r\n"));
-    destinationLocation.erase(destinationLocation.find_last_not_of(" \t\r\n") + 1);
+    // Trim and uppercase
+    sourceLocation = toUpper(trim(sourceLocation));
+    destinationLocation = toUpper(trim(destinationLocation));
 
-    // Validate that only a single location ID was entered
-    if (destinationLocation.find(",") != string::npos) {
-        cout << "Error: Invalid destination location format. Enter only a single location ID.\n";
+    if (sourceLocation.find(",") != string::npos || destinationLocation.find(",") != string::npos) {
+        cout << "Error: Invalid source or destination format. Use single location IDs.\n";
         return;
     }
 
-    // Run Independent Route Planning
+    // input.txt
+    ofstream inputFile("/home/martagfmartins/Desktop/faculdade/da/project1_DA/input.txt", ios::trunc);
+    if (!inputFile.is_open()) {
+        cerr << "Error: Could not write input.txt\n";
+        return;
+    }
+    inputFile << "Mode:driving\n";
+    inputFile << "Source:" << sourceLocation << "\n";
+    inputFile << "Destination:" << destinationLocation << "\n";
+    inputFile.close();
+
+    // Run route planner
     double bestRouteTime, alternativeRouteTime;
     auto [bestRoute, alternativeRoute] = planner.findIndependentRoutes(sourceLocation, destinationLocation, bestRouteTime, alternativeRouteTime);
 
-    // Display Results
-    cout << "\n===== Driving Route Results =====" << endl;
-    cout << "Source: " << sourceLocation << endl;
-    cout << "Destination: " << destinationLocation << endl;
+    // output content
+    stringstream output;
+    output << "===== Driving Route Results =====\n";
+    output << "Source:" << sourceLocation << "\n";
+    output << "Destination:" << destinationLocation << "\n";
 
     if (bestRoute.empty()) {
-        cout << "BestDrivingRoute: none" << endl;
-        cout << "AlternativeDrivingRoute: none" << endl;
+        output << "BestDrivingRoute:none\n";
+        output << "AlternativeDrivingRoute:none\n";
     } else {
-        cout << "BestDrivingRoute: ";
-        for (size_t i = 0; i < bestRoute.size(); i++) {
-            cout << bestRoute[i];
-            if (i < bestRoute.size() - 1) cout << ",";
+        output << "BestDrivingRoute:";
+        for (size_t i = 0; i < bestRoute.size(); ++i) {
+            output << bestRoute[i];
+            if (i < bestRoute.size() - 1) output << ",";
         }
-        cout << " (" << bestRouteTime << ")\n";
+        output << "(" << static_cast<int>(round(bestRouteTime)) << ")\n";
 
         if (alternativeRoute.empty()) {
-            cout << "AlternativeDrivingRoute: none" << endl;
+            output << "AlternativeDrivingRoute:none\n";
         } else {
-            cout << "AlternativeDrivingRoute: ";
-            for (size_t i = 0; i < alternativeRoute.size(); i++) {
-                cout << alternativeRoute[i];
-                if (i < alternativeRoute.size() - 1) cout << ",";
+            output << "AlternativeDrivingRoute:";
+            for (size_t i = 0; i < alternativeRoute.size(); ++i) {
+                output << alternativeRoute[i];
+                if (i < alternativeRoute.size() - 1) output << ",";
             }
-            cout << " (" << alternativeRouteTime << ")\n";
+            output << "(" << static_cast<int>(round(alternativeRouteTime)) << ")\n";
         }
     }
 
-    // Write results to output.txt
+    // Print to terminal
+    cout << output.str();
+
+    // Write to output.txt
     ofstream outputFile("/home/martagfmartins/Desktop/faculdade/da/project1_DA/output.txt", ios::trunc);
     if (!outputFile.is_open()) {
-        cerr << "Error: Could not create output.txt" << endl;
+        cerr << "Error: Could not write output.txt\n";
         return;
     }
 
-    outputFile << "Source:" << sourceLocation << endl;
-    outputFile << "Destination:" << destinationLocation << endl;
+    // output.txt only needs content after Mode, so skip the header
+    outputFile << "Source:" << sourceLocation << "\n";
+    outputFile << "Destination:" << destinationLocation << "\n";
+
     if (bestRoute.empty()) {
         outputFile << "BestDrivingRoute:none\n";
         outputFile << "AlternativeDrivingRoute:none\n";
     } else {
         outputFile << "BestDrivingRoute:";
-        for (size_t i = 0; i < bestRoute.size(); i++) {
+        for (size_t i = 0; i < bestRoute.size(); ++i) {
             outputFile << bestRoute[i];
             if (i < bestRoute.size() - 1) outputFile << ",";
         }
-        outputFile << "(" << bestRouteTime << ")\n";
+        outputFile << "(" << static_cast<int>(round(bestRouteTime)) << ")\n";
 
         if (alternativeRoute.empty()) {
             outputFile << "AlternativeDrivingRoute:none\n";
         } else {
             outputFile << "AlternativeDrivingRoute:";
-            for (size_t i = 0; i < alternativeRoute.size(); i++) {
+            for (size_t i = 0; i < alternativeRoute.size(); ++i) {
                 outputFile << alternativeRoute[i];
                 if (i < alternativeRoute.size() - 1) outputFile << ",";
             }
-            outputFile << "(" << alternativeRouteTime << ")\n";
+            outputFile << "(" << static_cast<int>(round(alternativeRouteTime)) << ")\n";
         }
     }
+
     outputFile.close();
     cout << "Results written to output.txt\n";
 }
 
 
+
 void Menu::restrictedRoute() {
-    // Load Graph
+    // Load graph
     GraphInterface graphInterface;
     graphInterface.loadLocations("/home/martagfmartins/Desktop/faculdade/da/project1_DA/smallDataset2/smallLocations2.csv");
     graphInterface.loadDistances("/home/martagfmartins/Desktop/faculdade/da/project1_DA/smallDataset2/smallDistances2.csv");
@@ -243,112 +263,108 @@ void Menu::restrictedRoute() {
     cin >> sourceLocation;
     cout << "Enter Destination Location ID: ";
     cin >> destinationLocation;
-
     cin.ignore();
 
-    unordered_set<string> avoidNodes;
+    sourceLocation = toUpper(trim(sourceLocation));
+    destinationLocation = toUpper(trim(destinationLocation));
+
+    unordered_set<string> avoidNodesSet;
     vector<pair<string, string>> avoidSegments;
 
-    // Ask user if they want to avoid nodes
     cout << "Enter nodes to avoid (comma-separated, or leave empty): ";
     string avoidNodesInput;
     getline(cin, avoidNodesInput);
-
-    // Validate avoidNodes format: No parentheses allowed, only commas
-    if (!avoidNodesInput.empty() && (avoidNodesInput.find("(") != string::npos || avoidNodesInput.find(")") != string::npos)) {
-        cout << "Error: Invalid format for avoidNodes. Use comma-separated values without parentheses.\n";
-        return; // Exit function and ask for input again
+    if (!avoidNodesInput.empty()) {
+        if (!isValidAvoidNodesFormat(avoidNodesInput)) {
+            cout << "Error: Invalid format for avoid nodes.\n";
+            return;
+        }
+        auto nodes = parseAvoidNodes(avoidNodesInput, *(new bool(true)));
+        for (auto &n : nodes) avoidNodesSet.insert(toUpper(n));
     }
 
-    // Process avoidNodes input (only if it's valid)
-    istringstream avoidNodesStream(avoidNodesInput);
-    string node;
-    while (getline(avoidNodesStream, node, ',')) {
-        avoidNodes.insert(node);
-    }
-
-    // Ask user if they want to avoid segments
-    cout << "Enter segments to avoid in format (id,id),(id,id) or leave empty: ";
+    cout << "Enter segments to avoid (format: (id,id),(id,id) or leave empty): ";
     string avoidSegmentsInput;
     getline(cin, avoidSegmentsInput);
     if (!avoidSegmentsInput.empty()) {
-        if (avoidSegmentsInput.find("(") == string::npos || avoidSegmentsInput.find(")") == string::npos) {
-            cout << "Error: Invalid format for segments. Use (id,id),(id,id).\n";
-            return; // Exit function
+        if (!isValidAvoidSegmentsFormat(avoidSegmentsInput)) {
+            cout << "Error: Invalid format for avoid segments.\n";
+            return;
         }
-
-        size_t pos = 0;
-        while ((pos = avoidSegmentsInput.find("(")) != string::npos) {
-            size_t endPos = avoidSegmentsInput.find(")");
-            if (endPos == string::npos) {
-                cout << "Error: Invalid format for segments. Ensure each segment is in (id,id) format.\n";
-                return;
-            }
-            string segment = avoidSegmentsInput.substr(pos + 1, endPos - pos - 1);
-            size_t commaPos = segment.find(",");
-
-            if (commaPos == string::npos) {
-                cout << "Error: Invalid segment format. Each segment must be (id,id).\n";
-                return;
-            }
-
-            string from = segment.substr(0, commaPos);
-            string to = segment.substr(commaPos + 1);
-            avoidSegments.emplace_back(from, to);
-
-            avoidSegmentsInput.erase(0, endPos + 1);
+        avoidSegments = parseAvoidSegments(avoidSegmentsInput, *(new bool(true)));
+        for (auto &seg : avoidSegments) {
+            seg.first = toUpper(seg.first);
+            seg.second = toUpper(seg.second);
         }
     }
 
-    // Ask for an include node
     cout << "Enter a mandatory node to include (or leave empty): ";
     getline(cin, includeNode);
-
-    // Trim spaces
-    includeNode.erase(0, includeNode.find_first_not_of(" \t\r\n"));
-    includeNode.erase(includeNode.find_last_not_of(" \t\r\n") + 1);
-
-    // Validate includeNode: It must be a single node (no commas)
+    includeNode = toUpper(trim(includeNode));
     if (!includeNode.empty() && includeNode.find(",") != string::npos) {
-        cout << "Error: Invalid format for node. Only enter a single node ID or leave empty.\n";
+        cout << "Error: Invalid format for include node.\n";
         return;
     }
 
-    // Run restricted route planning
-    double totalTravelTime;
-    vector<string> restrictedRoute = planner.findRestrictedRoute(
-        sourceLocation, destinationLocation, avoidNodes, avoidSegments, includeNode, totalTravelTime);
+    // Write input.txt
+    ofstream inputFile("/home/martagfmartins/Desktop/faculdade/da/project1_DA/input.txt", ios::trunc);
+    if (!inputFile.is_open()) {
+        cerr << "Error: Could not write input.txt\n";
+        return;
+    }
+    inputFile << "Mode:driving\n";
+    inputFile << "Source:" << sourceLocation << "\n";
+    inputFile << "Destination:" << destinationLocation << "\n";
+    inputFile << "AvoidNodes:" << avoidNodesInput << "\n";
+    inputFile << "AvoidSegments:" << avoidSegmentsInput << "\n";
+    inputFile << "IncludeNode:" << includeNode << "\n";
+    inputFile.close();
 
-    // Display Results
-    cout << "\n===== Restricted Route Results =====" << endl;
-    cout << "Source: " << sourceLocation << endl;
-    cout << "Destination: " << destinationLocation << endl;
+    // Execute planning
+    double totalTravelTime;
+    auto restrictedRoute = planner.findRestrictedRoute(
+        sourceLocation, destinationLocation, avoidNodesSet, avoidSegments, includeNode, totalTravelTime
+    );
+
+    // Build output
+    stringstream output;
+    output << "===== Restricted Route Results =====\n";
+    output << "Source:" << sourceLocation << "\n";
+    output << "Destination:" << destinationLocation << "\n";
 
     if (restrictedRoute.empty()) {
-        cout << "RestrictedDrivingRoute: none" << endl;
+        output << "RestrictedDrivingRoute:none\n";
     } else {
-        cout << "RestrictedDrivingRoute: ";
-        for (size_t i = 0; i < restrictedRoute.size(); i++) {
-            cout << restrictedRoute[i];
-            if (i < restrictedRoute.size() - 1) cout << ",";
+        output << "RestrictedDrivingRoute:";
+        for (size_t i = 0; i < restrictedRoute.size(); ++i) {
+            output << restrictedRoute[i];
+            if (i < restrictedRoute.size() - 1) output << ",";
         }
-        cout << " (" << totalTravelTime << ")\n";
+        output << "(" << static_cast<int>(round(totalTravelTime)) << ")\n";
     }
 
-    // Write results to output.txt
+    // Terminal output
+    cout << output.str();
+
+    // Write to output.txt
     ofstream outputFile("/home/martagfmartins/Desktop/faculdade/da/project1_DA/output.txt", ios::trunc);
-    outputFile << "Source:" << sourceLocation << endl;
-    outputFile << "Destination:" << destinationLocation << endl;
+    if (!outputFile.is_open()) {
+        cerr << "Error: Could not write output.txt\n";
+        return;
+    }
+    outputFile << "Source:" << sourceLocation << "\n";
+    outputFile << "Destination:" << destinationLocation << "\n";
     if (restrictedRoute.empty()) {
         outputFile << "RestrictedDrivingRoute:none\n";
     } else {
         outputFile << "RestrictedDrivingRoute:";
-        for (size_t i = 0; i < restrictedRoute.size(); i++) {
+        for (size_t i = 0; i < restrictedRoute.size(); ++i) {
             outputFile << restrictedRoute[i];
             if (i < restrictedRoute.size() - 1) outputFile << ",";
         }
-        outputFile << "(" << totalTravelTime << ")\n";
+        outputFile << "(" << static_cast<int>(round(totalTravelTime)) << ")\n";
     }
+
     outputFile.close();
     cout << "Results written to output.txt\n";
 }
@@ -356,143 +372,18 @@ void Menu::restrictedRoute() {
 
 void Menu::bestDrivingWalkingRoute() {
     GraphInterface graphInterface;
-    
-    graphInterface.loadLocations("path/to/your/locations.csv");
-    graphInterface.loadDistances("path/to/your/distances.csv");
+    graphInterface.loadLocations("/home/martagfmartins/Desktop/faculdade/da/project1_DA/smallDataset2/smallLocations2.csv");
+    graphInterface.loadDistances("/home/martagfmartins/Desktop/faculdade/da/project1_DA/smallDataset2/smallDistances2.csv");
     Graph<string>& graph = graphInterface.getGraph();
     const unordered_map<string, bool>& parkingInfo = graphInterface.getParkingInfo();
-    
-    DrivingWalkingRoutePlanning dwPlanner(graph, parkingInfo);
-    
-    string source, destination;
-    int maxWalkTime;
-    unordered_set<string> avoidNodes;
-    vector<pair<string, string>> avoidSegments;
-    
-    cout << "Enter Source Location ID: ";
-    cin >> source;
-    cout << "Enter Destination Location ID: ";
-    cin >> destination;
-    cout << "Enter Maximum Walking Time: ";
-    cin >> maxWalkTime;
-    cin.ignore(); // Clear newline
-    
-    cout << "Enter avoid nodes (comma separated, or leave empty): ";
-    string avoidNodesInput;
-    getline(cin, avoidNodesInput);
-    if (!avoidNodesInput.empty()) {
-        istringstream iss(avoidNodesInput);
-        string token;
-        while(getline(iss, token, ',')) {
-            avoidNodes.insert(token);
-        }
-    }
-    
-    cout << "Enter avoid segments (format: (id,id),(id,id) or leave empty): ";
-    string avoidSegmentsInput;
-    getline(cin, avoidSegmentsInput);
-    if (!avoidSegmentsInput.empty()) {
-        size_t pos = 0;
-        while ((pos = avoidSegmentsInput.find("(")) != string::npos) {
-            size_t endPos = avoidSegmentsInput.find(")", pos);
-            if (endPos == string::npos)
-                break;
-            string segment = avoidSegmentsInput.substr(pos + 1, endPos - pos - 1);
-            size_t commaPos = segment.find(",");
-            if (commaPos != string::npos) {
-                string from = segment.substr(0, commaPos);
-                string to = segment.substr(commaPos + 1);
-                avoidSegments.push_back({from, to});
-            }
-            avoidSegmentsInput.erase(0, endPos + 1);
-        }
-    }
-    
-    string errorMessage;
-    auto route = dwPlanner.findBestRoute(source, destination, maxWalkTime, avoidNodes, avoidSegments, errorMessage);
-    
-    cout << "\n===== Driving & Walking Route Results =====" << endl;
-    cout << "Source:" << source << endl;
-    cout << "Destination:" << destination << endl;
-    if (route.drivingRoute.empty() || route.walkingRoute.empty() || route.parkingNode.empty()) {
-        cout << "DrivingRoute:none" << endl;
-        cout << "ParkingNode:none" << endl;
-        cout << "WalkingRoute:none" << endl;
-        cout << "TotalTime:" << endl;
-        cout << "Message:" << errorMessage << endl;
-    } else {
-        cout << "DrivingRoute:";
-        for (size_t i = 0; i < route.drivingRoute.size(); i++) {
-            cout << route.drivingRoute[i];
-            if (i < route.drivingRoute.size() - 1)
-                cout << ",";
-        }
-        cout << "(" << route.drivingTime << ")" << endl;
-        
-        cout << "ParkingNode:" << route.parkingNode << endl;
-        
-        cout << "WalkingRoute:";
-        for (size_t i = 0; i < route.walkingRoute.size(); i++) {
-            cout << route.walkingRoute[i];
-            if (i < route.walkingRoute.size() - 1)
-                cout << ",";
-        }
-        cout << "(" << route.walkingTime << ")" << endl;
-        
-        cout << "TotalTime:" << "(" << route.totalTime << ")" << endl;
-    }
-    
-    // Write results to output file.
-    ofstream outputFile("output.txt", ios::trunc);
-    if (outputFile.is_open()) {
-        outputFile << "Source:" << source << "\n";
-        outputFile << "Destination:" << destination << "\n";
-        if (route.drivingRoute.empty() || route.walkingRoute.empty() || route.parkingNode.empty()) {
-            outputFile << "DrivingRoute:none\n";
-            outputFile << "ParkingNode:none\n";
-            outputFile << "WalkingRoute:none\n";
-            outputFile << "TotalTime:\n";
-            outputFile << "Message:" << errorMessage << "\n";
-        } else {
-            outputFile << "DrivingRoute:";
-            for (size_t i = 0; i < route.drivingRoute.size(); i++) {
-                outputFile << route.drivingRoute[i];
-                if (i < route.drivingRoute.size() - 1)
-                    outputFile << ",";
-            }
-            outputFile << "(" << route.drivingTime << ")\n";
-            outputFile << "ParkingNode:" << route.parkingNode << "\n";
-            outputFile << "WalkingRoute:";
-            for (size_t i = 0; i < route.walkingRoute.size(); i++) {
-                outputFile << route.walkingRoute[i];
-                if (i < route.walkingRoute.size() - 1)
-                    outputFile << ",";
-            }
-            outputFile << "(" << route.walkingTime << ")\n";
-            outputFile << "TotalTime:" << "(" << route.totalTime << ")\n";
-        }
-        outputFile.close();
-        cout << "Results written to output.txt" << endl;
-    }
-}
 
-void Menu::approximateSolutions() {
-    cout << "Approximate Solutions selected." << endl;
-    GraphInterface graphInterface;
-    
-    graphInterface.loadLocations("path/to/your/locations.csv");
-    graphInterface.loadDistances("path/to/your/distances.csv");
-    Graph<string>& graph = graphInterface.getGraph();
-    const unordered_map<string, bool>& parkingInfo = graphInterface.getParkingInfo();
-    
     DrivingWalkingRoutePlanning dwPlanner(graph, parkingInfo);
-    
-    
+
     string source, destination;
     int maxWalkTime;
     unordered_set<string> avoidNodes;
     vector<pair<string, string>> avoidSegments;
-    
+
     cout << "Enter Source Location ID: ";
     cin >> source;
     cout << "Enter Destination Location ID: ";
@@ -500,67 +391,277 @@ void Menu::approximateSolutions() {
     cout << "Enter Maximum Walking Time: ";
     cin >> maxWalkTime;
     cin.ignore();
-    
+
+    source = toUpper(source);
+    destination = toUpper(destination);
+
     cout << "Enter avoid nodes (comma separated, or leave empty): ";
     string avoidNodesInput;
     getline(cin, avoidNodesInput);
     if (!avoidNodesInput.empty()) {
-        istringstream iss(avoidNodesInput);
-        string token;
-        while(getline(iss, token, ',')) {
-            avoidNodes.insert(token);
+        if (!isValidAvoidNodesFormat(avoidNodesInput)) {
+            cout << "Error: Invalid format for avoid nodes.\n";
+            return;
         }
+        vector<string> nodes = parseAvoidNodes(avoidNodesInput, *(new bool(true)));
+        for (auto &token : nodes)
+            avoidNodes.insert(toUpper(token));
     }
-    
+
     cout << "Enter avoid segments (format: (id,id),(id,id) or leave empty): ";
     string avoidSegmentsInput;
     getline(cin, avoidSegmentsInput);
     if (!avoidSegmentsInput.empty()) {
-        size_t pos = 0;
-        while ((pos = avoidSegmentsInput.find("(")) != string::npos) {
-            size_t endPos = avoidSegmentsInput.find(")", pos);
-            if (endPos == string::npos)
-                break;
-            string segment = avoidSegmentsInput.substr(pos + 1, endPos - pos - 1);
-            size_t commaPos = segment.find(",");
-            if (commaPos != string::npos) {
-                string from = segment.substr(0, commaPos);
-                string to = segment.substr(commaPos + 1);
-                avoidSegments.push_back({from, to});
-            }
-            avoidSegmentsInput.erase(0, endPos + 1);
+        if (!isValidAvoidSegmentsFormat(avoidSegmentsInput)) {
+            cout << "Error: Invalid format for avoid segments.\n";
+            return;
+        }
+        avoidSegments = parseAvoidSegments(avoidSegmentsInput, *(new bool(true)));
+        for (auto &seg : avoidSegments) {
+            seg.first = toUpper(seg.first);
+            seg.second = toUpper(seg.second);
         }
     }
-    
-    auto alternatives = dwPlanner.findApproximateRoutes(source, destination, maxWalkTime, avoidNodes, avoidSegments);
-    cout << "\n===== Approximate Routes =====" << endl;
-    if (alternatives.empty()) {
-        cout << "No approximate routes found." << endl;
+
+    // input.txt
+    ofstream inputFile("/home/martagfmartins/Desktop/faculdade/da/project1_DA/input.txt", ios::trunc);
+    if (!inputFile.is_open()) {
+        cerr << "Error: Could not write input.txt" << endl;
+        return;
+    }
+    inputFile << "Mode:driving-walking\n";
+    inputFile << "Source:" << source << "\n";
+    inputFile << "Destination:" << destination << "\n";
+    inputFile << "MaxWalkTime:" << maxWalkTime << "\n";
+    inputFile << "AvoidNodes:" << avoidNodesInput << "\n";
+    inputFile << "AvoidSegments:" << avoidSegmentsInput << "\n";
+    inputFile.close();
+
+    // route
+    string errorMessage;
+    auto route = dwPlanner.findBestRoute(source, destination, maxWalkTime, avoidNodes, avoidSegments, errorMessage);
+
+    // strings separadas
+    stringstream terminalOutput;
+    stringstream fileOutput;
+
+    terminalOutput << "\n ===== Driving & Walking Route Results =====\n";
+    terminalOutput << "Source:" << source << "\n";
+    terminalOutput << "Destination:" << destination << "\n";
+
+    fileOutput << "Source:" << source << "\n";
+    fileOutput << "Destination:" << destination << "\n";
+
+    if (route.drivingRoute.empty() || route.walkingRoute.empty() || route.parkingNode.empty()) {
+        terminalOutput << "DrivingRoute:none\n";
+        terminalOutput << "ParkingNode:none\n";
+        terminalOutput << "WalkingRoute:none\n";
+        terminalOutput << "TotalTime:\n";
+        terminalOutput << "Message:" << errorMessage << "\n";
+
+        fileOutput << "DrivingRoute:none\n";
+        fileOutput << "ParkingNode:none\n";
+        fileOutput << "WalkingRoute:none\n";
+        fileOutput << "TotalTime:\n";
+        fileOutput << "Message:" << errorMessage << "\n";
     } else {
-        for (size_t i = 0; i < alternatives.size(); i++) {
-            cout << "DrivingRoute" << i+1 << ":";
-            for (size_t j = 0; j < alternatives[i].drivingRoute.size(); j++) {
-                cout << alternatives[i].drivingRoute[j];
-                if (j < alternatives[i].drivingRoute.size() - 1)
-                    cout << ",";
+        // Driving route
+        terminalOutput << "DrivingRoute:";
+        fileOutput << "DrivingRoute:";
+        for (size_t i = 0; i < route.drivingRoute.size(); i++) {
+            terminalOutput << route.drivingRoute[i];
+            fileOutput << route.drivingRoute[i];
+            if (i < route.drivingRoute.size() - 1) {
+                terminalOutput << ",";
+                fileOutput << ",";
             }
-            cout << "(" << alternatives[i].drivingTime << ")" << endl;
-            
-            cout << "ParkingNode" << i+1 << ":" << alternatives[i].parkingNode << endl;
-            
-            cout << "WalkingRoute" << i+1 << ":";
-            for (size_t j = 0; j < alternatives[i].walkingRoute.size(); j++) {
-                cout << alternatives[i].walkingRoute[j];
-                if (j < alternatives[i].walkingRoute.size() - 1)
-                    cout << ",";
-            }
-            cout << "(" << alternatives[i].walkingTime << ")" << endl;
-            
-            cout << "TotalTime" << i+1 << ":" << "(" << alternatives[i].totalTime << ")" << endl;
         }
+        terminalOutput << "(" << static_cast<int>(route.drivingTime) << ")\n";
+        fileOutput << "(" << static_cast<int>(route.drivingTime) << ")\n";
+
+        terminalOutput << "ParkingNode:" << route.parkingNode << "\n";
+        fileOutput << "ParkingNode:" << route.parkingNode << "\n";
+
+        terminalOutput << "WalkingRoute:";
+        fileOutput << "WalkingRoute:";
+        for (size_t i = 0; i < route.walkingRoute.size(); i++) {
+            terminalOutput << route.walkingRoute[i];
+            fileOutput << route.walkingRoute[i];
+            if (i < route.walkingRoute.size() - 1) {
+                terminalOutput << ",";
+                fileOutput << ",";
+            }
+        }
+        terminalOutput << "(" << static_cast<int>(route.walkingTime) << ")\n";
+        fileOutput << "(" << static_cast<int>(route.walkingTime) << ")\n";
+
+        terminalOutput << "TotalTime:(" << static_cast<int>(route.totalTime) << ")\n";
+        fileOutput << "TotalTime:(" << static_cast<int>(route.totalTime) << ")\n";
     }
+
+    // print no terminal
+    cout << terminalOutput.str();
+    cout << "Results written to output.txt" << endl;
+
+    // guardar em output.txt
+    ofstream outputFile("/home/martagfmartins/Desktop/faculdade/da/project1_DA/output.txt", ios::trunc);
+    if (!outputFile.is_open()) {
+        cerr << "Error: Could not write output.txt" << endl;
+        return;
+    }
+    outputFile << fileOutput.str();
+    outputFile.close();
 }
 
+
+void Menu::approximateSolutions() {
+    cout << "Approximate Solutions selected." << endl;
+    GraphInterface graphInterface;
+
+    // Load dataset
+    graphInterface.loadLocations("/home/martagfmartins/Desktop/faculdade/da/project1_DA/smallDataset2/smallLocations2.csv");
+    graphInterface.loadDistances("/home/martagfmartins/Desktop/faculdade/da/project1_DA/smallDataset2/smallDistances2.csv");
+    Graph<string>& graph = graphInterface.getGraph();
+    const unordered_map<string, bool>& parkingInfo = graphInterface.getParkingInfo();
+
+    DrivingWalkingRoutePlanning dwPlanner(graph, parkingInfo);
+
+    string source, destination;
+    int maxWalkTime;
+    unordered_set<string> avoidNodes;
+    vector<pair<string, string>> avoidSegments;
+
+    cout << "Enter Source Location ID: ";
+    cin >> source;
+    cout << "Enter Destination Location ID: ";
+    cin >> destination;
+    cout << "Enter Maximum Walking Time: ";
+    cin >> maxWalkTime;
+    cin.ignore(); // clear newline
+
+    source = toUpper(source);
+    destination = toUpper(destination);
+
+    cout << "Enter avoid nodes (comma separated, or leave empty): ";
+    string avoidNodesInput;
+    getline(cin, avoidNodesInput);
+    if (!avoidNodesInput.empty()) {
+        if (!isValidAvoidNodesFormat(avoidNodesInput)) {
+            cout << "Error: Invalid format for avoid nodes." << endl;
+            return;
+        }
+        vector<string> nodes = parseAvoidNodes(avoidNodesInput, *(new bool(true)));
+        for (auto &token : nodes) {
+            avoidNodes.insert(toUpper(token));
+        }
+    }
+
+    cout << "Enter avoid segments (format: (id,id),(id,id) or leave empty): ";
+    string avoidSegmentsInput;
+    getline(cin, avoidSegmentsInput);
+    if (!avoidSegmentsInput.empty()) {
+        if (!isValidAvoidSegmentsFormat(avoidSegmentsInput)) {
+            cout << "Error: Invalid format for avoid segments." << endl;
+            return;
+        }
+        avoidSegments = parseAvoidSegments(avoidSegmentsInput, *(new bool(true)));
+        for (auto &seg : avoidSegments) {
+            seg.first = toUpper(seg.first);
+            seg.second = toUpper(seg.second);
+        }
+    }
+
+    // Write input.txt
+    ofstream inputFile("/home/martagfmartins/Desktop/faculdade/da/project1_DA/input.txt", ios::trunc);
+    if (!inputFile.is_open()) {
+        cerr << "Error: Could not write input.txt" << endl;
+        return;
+    }
+    inputFile << "Mode:driving-walking\n";
+    inputFile << "Source:" << source << "\n";
+    inputFile << "Destination:" << destination << "\n";
+    inputFile << "MaxWalkTime:" << maxWalkTime << "\n";
+    inputFile << "AvoidNodes:" << avoidNodesInput << "\n";
+    inputFile << "AvoidSegments:" << avoidSegmentsInput << "\n";
+    inputFile.close();
+
+    // Process
+    auto alternatives = dwPlanner.findApproximateRoutes(source, destination, maxWalkTime, avoidNodes, avoidSegments);
+
+    // Build output
+    stringstream output;
+    output << "\n===== Approximate Routes =====\n";
+    if (alternatives.empty()) {
+        output << "No approximate routes found.\n";
+    } else {
+        for (size_t i = 0; i < alternatives.size(); i++) {
+            output << "DrivingRoute" << i + 1 << ":";
+            for (size_t j = 0; j < alternatives[i].drivingRoute.size(); j++) {
+                output << alternatives[i].drivingRoute[j];
+                if (j < alternatives[i].drivingRoute.size() - 1) output << ",";
+            }
+            output << "(" << static_cast<int>(alternatives[i].drivingTime) << ")\n";
+
+            output << "ParkingNode" << i + 1 << ":" << alternatives[i].parkingNode << "\n";
+
+            output << "WalkingRoute" << i + 1 << ":";
+            for (size_t j = 0; j < alternatives[i].walkingRoute.size(); j++) {
+                output << alternatives[i].walkingRoute[j];
+                if (j < alternatives[i].walkingRoute.size() - 1) output << ",";
+            }
+            output << "(" << static_cast<int>(alternatives[i].walkingTime) << ")\n";
+
+            output << "TotalTime" << i + 1 << ":(" << static_cast<int>(alternatives[i].totalTime) << ")\n";
+        }
+    }
+
+    // Output to terminal
+    cout << output.str();
+
+    // Write output.txt
+    ofstream outputFile("/home/martagfmartins/Desktop/faculdade/da/project1_DA/output.txt", ios::trunc);
+    if (!outputFile.is_open()) {
+        cerr << "Error: Could not write output.txt" << endl;
+        return;
+    }
+    outputFile << "Source:" << source << "\n";
+    outputFile << "Destination:" << destination << "\n";
+    if (alternatives.empty()) {
+        outputFile << "DrivingRoute1:none\n";
+        outputFile << "ParkingNode1:none\n";
+        outputFile << "WalkingRoute1:none\n";
+        outputFile << "TotalTime1:\n";
+        outputFile << "DrivingRoute2:none\n";
+        outputFile << "ParkingNode2:none\n";
+        outputFile << "WalkingRoute2:none\n";
+        outputFile << "TotalTime2:\n";
+    } else {
+        for (size_t i = 0; i < alternatives.size(); i++) {
+            outputFile << "DrivingRoute" << i + 1 << ":";
+            for (size_t j = 0; j < alternatives[i].drivingRoute.size(); j++) {
+                outputFile << alternatives[i].drivingRoute[j];
+                if (j < alternatives[i].drivingRoute.size() - 1) outputFile << ",";
+            }
+            outputFile << "(" << static_cast<int>(alternatives[i].drivingTime) << ")\n";
+
+            outputFile << "ParkingNode" << i + 1 << ":" << alternatives[i].parkingNode << "\n";
+
+            outputFile << "WalkingRoute" << i + 1 << ":";
+            for (size_t j = 0; j < alternatives[i].walkingRoute.size(); j++) {
+                outputFile << alternatives[i].walkingRoute[j];
+                if (j < alternatives[i].walkingRoute.size() - 1) outputFile << ",";
+            }
+            outputFile << "(" << static_cast<int>(alternatives[i].walkingTime) << ")\n";
+
+            outputFile << "TotalTime" << i + 1 << ":(" << static_cast<int>(alternatives[i].totalTime) << ")\n";
+        }
+    }
+
+    outputFile.close();
+    cout << "Results written to output.txt" << endl;
+}
+
+
 void Menu::end() {
-    cout << "Exiting program..." << endl;
+    std::cout << "Exiting program..." << std::endl;
 }
