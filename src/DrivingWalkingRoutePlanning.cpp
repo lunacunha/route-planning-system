@@ -212,17 +212,12 @@ vector<DrivingWalkingRoute> DrivingWalkingRoutePlanning::findApproximateRoutes(
     const vector<pair<string, string>>& avoidSegments) {
 
     vector<DrivingWalkingRoute> suggestions;
-    unordered_set<string> seenHashes; // For detecting duplicates
-
-    // Try with incremental relaxations
+    unordered_set<string> seenHashes;
     vector<int> increments = { maxWalkTime + 5, maxWalkTime + 10, maxWalkTime + 15, maxWalkTime + 20 };
 
     for (int newMaxWalkTime : increments) {
-        string dummyError;
-        DrivingWalkingRoute route = findBestRoute(source, destination, newMaxWalkTime, avoidNodes, avoidSegments, dummyError);
-
-        if (!route.drivingRoute.empty() && !route.walkingRoute.empty() && !route.parkingNode.empty()) {
-            // Create a unique hash string to detect duplicates
+        auto candidates = findAllValidRoutes(source, destination, newMaxWalkTime, avoidNodes, avoidSegments);
+        for (const auto& route : candidates) {
             string hash = route.parkingNode + "|" +
                           accumulate(route.drivingRoute.begin(), route.drivingRoute.end(), string()) + "|" +
                           accumulate(route.walkingRoute.begin(), route.walkingRoute.end(), string());
@@ -230,9 +225,9 @@ vector<DrivingWalkingRoute> DrivingWalkingRoutePlanning::findApproximateRoutes(
             if (seenHashes.count(hash) == 0) {
                 seenHashes.insert(hash);
                 suggestions.push_back(route);
+                if (suggestions.size() == 2) break;
             }
         }
-
         if (suggestions.size() == 2) break;
     }
 
@@ -241,4 +236,80 @@ vector<DrivingWalkingRoute> DrivingWalkingRoutePlanning::findApproximateRoutes(
     });
 
     return suggestions;
+}
+
+
+vector<DrivingWalkingRoute> DrivingWalkingRoutePlanning::findAllValidRoutes(
+    const string& source, const string& destination,
+    int maxWalkTime,
+    const unordered_set<string>& avoidNodes,
+    const vector<pair<string, string>>& avoidSegments) {
+
+    vector<DrivingWalkingRoute> validRoutes;
+
+    // Validation
+    auto srcVertex = graph.findVertex(source);
+    auto destVertex = graph.findVertex(destination);
+    if (!srcVertex || !destVertex) return validRoutes;
+
+    if ((parkingInfo.find(source) != parkingInfo.end() && parkingInfo.at(source)) ||
+        (parkingInfo.find(destination) != parkingInfo.end() && parkingInfo.at(destination)))
+        return validRoutes;
+
+    // Check if source and destination are adjacent
+    for (const auto& edge : srcVertex->getAdj()) {
+        if (edge->getDest()->getInfo() == destination)
+            return validRoutes;
+    }
+
+    // Remove avoidSegments temporarily
+    vector<tuple<string, string, double, double>> removedEdges;
+    for (const auto& seg : avoidSegments) {
+        auto v1 = graph.findVertex(seg.first);
+        if (v1) {
+            for (const auto& edge : v1->getAdj()) {
+                if (edge->getDest()->getInfo() == seg.second) {
+                    removedEdges.emplace_back(seg.first, seg.second, edge->getDriving(), edge->getWalking());
+                    graph.removeEdge(seg.first, seg.second);
+                    break;
+                }
+            }
+        }
+    }
+
+    for (const auto& vertex : graph.getVertexSet()) {
+        string candidate = vertex->getInfo();
+        if (candidate == source || candidate == destination) continue;
+        if (parkingInfo.find(candidate) == parkingInfo.end() || !parkingInfo.at(candidate)) continue;
+
+        double drivingTime = 0.0;
+        auto drivingRoute = dijkstraDriving(source, candidate, drivingTime, avoidNodes);
+        if (drivingRoute.empty()) continue;
+        if (find(drivingRoute.begin(), drivingRoute.end(), destination) != drivingRoute.end()) continue;
+
+        double walkingTime = 0.0;
+        auto walkingRoute = dijkstraWalking(candidate, destination, walkingTime, avoidNodes);
+        if (walkingRoute.empty()) continue;
+
+        if (drivingRoute.size() < 2 || walkingRoute.size() < 2 || walkingTime > maxWalkTime) continue;
+
+        DrivingWalkingRoute route;
+        route.drivingRoute = drivingRoute;
+        route.parkingNode = candidate;
+        route.walkingRoute = walkingRoute;
+        route.drivingTime = drivingTime;
+        route.walkingTime = walkingTime;
+        route.totalTime = drivingTime + walkingTime;
+        validRoutes.push_back(route);
+    }
+
+    // Restore edges
+    for (const auto& edge : removedEdges) {
+        string from, to;
+        double d, w;
+        tie(from, to, d, w) = edge;
+        graph.addEdge(from, to, d, w);
+    }
+
+    return validRoutes;
 }

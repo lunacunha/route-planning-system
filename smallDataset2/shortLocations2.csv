@@ -1,11 +1,9 @@
 Location,Id,Code,Parking
-Location A,1,A,1
-Location B,2,B,0
-Location C,3,C,0
-Location D,4,D,1
-Location E,5,E,0
-Location F,6,F,0
-Location G,7,G,1
-Location H,8,H,0
-Location I,9,I,0
-Location J,10,J,1
+Trindade,1,1,0
+CampoAlegre,2,2,1
+Bolhão,3,3,1
+Aliados,4,4,0
+Sé,5,5,0
+Ribeira,6,6,1
+Foz,7,7,1
+Clérigos,8,8,0

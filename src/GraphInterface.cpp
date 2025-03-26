@@ -84,20 +84,19 @@ void GraphInterface::loadDistances(const string &filename) {
             continue;
         }
 
-        if (elements[2] == "X") {
-            drivingTime = -1;
-        } else if (all_of(elements[2].begin(), elements[2].end(), ::isdigit)) {
+        // Driving time
+        if (!elements[2].empty() && elements[2] != "X" && all_of(elements[2].begin(), elements[2].end(), ::isdigit)) {
             drivingTime = stoi(elements[2]);
-        } else {
-            continue;
         }
 
-        if (all_of(elements[3].begin(), elements[3].end(), ::isdigit)) {
+        // Walking time
+        if (!elements[3].empty() && all_of(elements[3].begin(), elements[3].end(), ::isdigit)) {
             walkingTime = stoi(elements[3]);
-        } else {
-            continue;
         }
 
-        graph.addEdge(location1, location2, drivingTime, walkingTime);
+        // Só adiciona aresta se pelo menos um dos tempos for válido
+        if (drivingTime >= 0 || walkingTime >= 0) {
+            graph.addEdge(location1, location2, drivingTime, walkingTime);
+        }
     }
 }

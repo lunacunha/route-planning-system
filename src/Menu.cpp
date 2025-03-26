@@ -35,6 +35,7 @@ Menu::Menu() {
              <<"#------------------------------#" << "\n"
              <<"#   1 -> Small dataset         #" << "\n"
              <<"#   2 -> Large dataset         #" << "\n"
+             <<"#   3 -> PDF dataset           #" << "\n"
              <<"#   E -> EXIT                  #" << "\n"
              <<"################################" << "\n"
              <<"Option: ";
@@ -47,6 +48,9 @@ Menu::Menu() {
         } else if (inp == "2") {
             loadData(2);
             init();
+        } else if (inp == "3") {
+            loadData(3);
+            init();
         } else if (inp == "e" || inp == "E") exit(0);
         else {
             cout << "Insert a valid input!" << endl;
@@ -55,6 +59,28 @@ Menu::Menu() {
         }
 
     }
+}
+
+void Menu::loadData(int option) {
+    switch(option) {
+        case 1:
+            graphInterface.loadLocations("smallDataset/shortLocations.csv");
+        graphInterface.loadDistances("smallDataset/shortDistances.csv");
+        break;
+        case 2:
+            graphInterface.loadLocations("dataset/Locations.csv");
+        graphInterface.loadDistances("dataset/Distances.csv");
+        case 3:
+            graphInterface.loadLocations("smallDataset2/shortLocations2.csv");
+        graphInterface.loadDistances("smallDataset2/shortDistances2.csv");
+        break;
+        default:
+            cerr << "Invalid dataset option provided to loadData." << endl;
+        exit(1);
+    }
+
+    this->graph = &graphInterface.getGraph();
+    this->parkingInfo = &graphInterface.getParkingInfo();
 }
 
 void Menu::init() {
@@ -84,26 +110,6 @@ void Menu::init() {
             init();
         }
     }
-}
-
-void Menu::loadData(int option) {
-    switch(option) {
-        case 1:
-            graphInterface.loadLocations("smallDataset/shortLocations.csv");
-        graphInterface.loadDistances("smallDataset/shortDistances.csv");
-        break;
-        case 2:
-            graphInterface.loadLocations("dataset/Locations.csv");
-        graphInterface.loadDistances("dataset/Distances.csv");
-        break;
-        default:
-            cerr << "Invalid dataset option provided to loadData." << endl;
-        exit(1);
-    }
-
-    // Atualiza os ponteiros de membro
-    this->graph = &graphInterface.getGraph();
-    this->parkingInfo = &graphInterface.getParkingInfo();
 }
 
 void Menu::drivingOnlyMenu() {

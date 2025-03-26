@@ -39,6 +39,12 @@ public:
                                                       int maxWalkTime, 
                                                       const unordered_set<string>& avoidNodes, 
                                                       const vector<pair<string, string>>& avoidSegments);
+    vector<DrivingWalkingRoute> findAllValidRoutes(
+    const string& source, const string& destination,
+    int maxWalkTime,
+    const unordered_set<string>& avoidNodes,
+    const vector<pair<string, string>>& avoidSegments) ;
+
     
 private:
     Graph<string>& graph;
