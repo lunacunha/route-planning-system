@@ -1,6 +1,4 @@
-Source:B
-Destination:H
-DrivingRoute:B,A,C,E,G(10)
-ParkingNode:G
-WalkingRoute:G,H(8)
-TotalTime:(18)
+Source:3
+Destination:3
+BestDrivingRoute:none
+AlternativeDrivingRoute:none

@@ -10,6 +10,7 @@
 #include <cctype>
 #include <iostream>
 #include <cmath>
+#include <memory>
 using namespace std;
 
 string Menu::trim(const string &s) {
@@ -41,10 +42,10 @@ Menu::Menu() {
         cin >> inp;
 
         if (inp == "1") {
-            //loadData(1);
+            loadData(1);
             init();
         } else if (inp == "2") {
-            //loadData(2);
+            loadData(2);
             init();
         } else if (inp == "e" || inp == "E") exit(0);
         else {
@@ -52,6 +53,7 @@ Menu::Menu() {
             cin.clear();
             Menu();
         }
+
     }
 }
 
@@ -82,6 +84,26 @@ void Menu::init() {
             init();
         }
     }
+}
+
+void Menu::loadData(int option) {
+    switch(option) {
+        case 1:
+            graphInterface.loadLocations("smallDataset/shortLocations.csv");
+        graphInterface.loadDistances("smallDataset/shortDistances.csv");
+        break;
+        case 2:
+            graphInterface.loadLocations("dataset/Locations.csv");
+        graphInterface.loadDistances("dataset/Distances.csv");
+        break;
+        default:
+            cerr << "Invalid dataset option provided to loadData." << endl;
+        exit(1);
+    }
+
+    // Atualiza os ponteiros de membro
+    this->graph = &graphInterface.getGraph();
+    this->parkingInfo = &graphInterface.getParkingInfo();
 }
 
 void Menu::drivingOnlyMenu() {
@@ -118,7 +140,6 @@ void Menu::drivingWalkingMenu() {
              <<"#    Driving & Walking Menu    #" << "\n"
              <<"#------------------------------#" << "\n"
              <<"#   1 -> Best Route            #" << "\n"
-             <<"#   2 -> Approximate Solutions #" << "\n"
              <<"#   B -> BACK                  #" << "\n"
              <<"################################" << "\n"
              <<"Option: ";
@@ -127,8 +148,6 @@ void Menu::drivingWalkingMenu() {
 
         if (inp == "1") {
             bestDrivingWalkingRoute();
-        } else if (inp == "2") {
-            approximateSolutions();
         } else if (inp == "B" || inp == "b") init();
         else {
             cout << "Insert a valid input!" << endl;
@@ -139,12 +158,11 @@ void Menu::drivingWalkingMenu() {
 }
 
 void Menu::independentRoute() {
-    // Load the graph
-    GraphInterface graphInterface;
-    graphInterface.loadLocations("/home/martagfmartins/Desktop/faculdade/da/project1_DA/smallDataset2/smallLocations2.csv");
-    graphInterface.loadDistances("/home/martagfmartins/Desktop/faculdade/da/project1_DA/smallDataset2/smallDistances2.csv");
-    Graph<string>& graph = graphInterface.getGraph();
-    RoutePlanning planner(graph);
+    if (!graph || !parkingInfo) {
+        cout << "Error: Graph data not loaded.\n";
+        return;
+    }
+    RoutePlanning planner(*graph);
 
     // User Input for Source and Destination
     string sourceLocation, destinationLocation;
@@ -163,7 +181,7 @@ void Menu::independentRoute() {
     }
 
     // input.txt
-    ofstream inputFile("/home/martagfmartins/Desktop/faculdade/da/project1_DA/input.txt", ios::trunc);
+    ofstream inputFile("input.txt", ios::trunc);
     if (!inputFile.is_open()) {
         cerr << "Error: Could not write input.txt\n";
         return;
@@ -210,7 +228,7 @@ void Menu::independentRoute() {
     cout << output.str();
 
     // Write to output.txt
-    ofstream outputFile("/home/martagfmartins/Desktop/faculdade/da/project1_DA/output.txt", ios::trunc);
+    ofstream outputFile("output.txt", ios::trunc);
     if (!outputFile.is_open()) {
         cerr << "Error: Could not write output.txt\n";
         return;
@@ -250,12 +268,13 @@ void Menu::independentRoute() {
 
 
 void Menu::restrictedRoute() {
-    // Load graph
-    GraphInterface graphInterface;
-    graphInterface.loadLocations("/home/martagfmartins/Desktop/faculdade/da/project1_DA/smallDataset2/smallLocations2.csv");
-    graphInterface.loadDistances("/home/martagfmartins/Desktop/faculdade/da/project1_DA/smallDataset2/smallDistances2.csv");
-    Graph<string>& graph = graphInterface.getGraph();
-    RoutePlanning planner(graph);
+
+    if (!graph || !parkingInfo) {
+        cout << "Error: Graph data not loaded.\n";
+        return;
+    }
+
+    RoutePlanning planner(*graph);
 
     // User Input
     string sourceLocation, destinationLocation, includeNode;
@@ -307,7 +326,7 @@ void Menu::restrictedRoute() {
     }
 
     // Write input.txt
-    ofstream inputFile("/home/martagfmartins/Desktop/faculdade/da/project1_DA/input.txt", ios::trunc);
+    ofstream inputFile("input.txt", ios::trunc);
     if (!inputFile.is_open()) {
         cerr << "Error: Could not write input.txt\n";
         return;
@@ -347,7 +366,7 @@ void Menu::restrictedRoute() {
     cout << output.str();
 
     // Write to output.txt
-    ofstream outputFile("/home/martagfmartins/Desktop/faculdade/da/project1_DA/output.txt", ios::trunc);
+    ofstream outputFile("output.txt", ios::trunc);
     if (!outputFile.is_open()) {
         cerr << "Error: Could not write output.txt\n";
         return;
@@ -371,13 +390,12 @@ void Menu::restrictedRoute() {
 
 
 void Menu::bestDrivingWalkingRoute() {
-    GraphInterface graphInterface;
-    graphInterface.loadLocations("/home/martagfmartins/Desktop/faculdade/da/project1_DA/smallDataset2/smallLocations2.csv");
-    graphInterface.loadDistances("/home/martagfmartins/Desktop/faculdade/da/project1_DA/smallDataset2/smallDistances2.csv");
-    Graph<string>& graph = graphInterface.getGraph();
-    const unordered_map<string, bool>& parkingInfo = graphInterface.getParkingInfo();
+    if (!graph || !parkingInfo) {
+        cout << "Error: Graph or parking data not loaded.\n";
+        return;
+    }
 
-    DrivingWalkingRoutePlanning dwPlanner(graph, parkingInfo);
+    DrivingWalkingRoutePlanning dwPlanner(*graph, *parkingInfo);
 
     string source, destination;
     int maxWalkTime;
@@ -424,7 +442,7 @@ void Menu::bestDrivingWalkingRoute() {
     }
 
     // input.txt
-    ofstream inputFile("/home/martagfmartins/Desktop/faculdade/da/project1_DA/input.txt", ios::trunc);
+    ofstream inputFile("input.txt", ios::trunc);
     if (!inputFile.is_open()) {
         cerr << "Error: Could not write input.txt" << endl;
         return;
@@ -441,11 +459,10 @@ void Menu::bestDrivingWalkingRoute() {
     string errorMessage;
     auto route = dwPlanner.findBestRoute(source, destination, maxWalkTime, avoidNodes, avoidSegments, errorMessage);
 
-    // strings separadas
     stringstream terminalOutput;
     stringstream fileOutput;
 
-    terminalOutput << "\n ===== Driving & Walking Route Results =====\n";
+    terminalOutput << "\n===== Driving & Walking Route Results =====\n";
     terminalOutput << "Source:" << source << "\n";
     terminalOutput << "Destination:" << destination << "\n";
 
@@ -464,47 +481,62 @@ void Menu::bestDrivingWalkingRoute() {
         fileOutput << "WalkingRoute:none\n";
         fileOutput << "TotalTime:\n";
         fileOutput << "Message:" << errorMessage << "\n";
-    } else {
-        // Driving route
-        terminalOutput << "DrivingRoute:";
-        fileOutput << "DrivingRoute:";
-        for (size_t i = 0; i < route.drivingRoute.size(); i++) {
-            terminalOutput << route.drivingRoute[i];
-            fileOutput << route.drivingRoute[i];
-            if (i < route.drivingRoute.size() - 1) {
-                terminalOutput << ",";
-                fileOutput << ",";
-            }
+
+        cout << terminalOutput.str();
+        cout << "Results written to output.txt" << endl;
+
+        // Write failure result to file
+        ofstream outputFile("output.txt", ios::trunc);
+        if (!outputFile.is_open()) {
+            cerr << "Error: Could not write output.txt" << endl;
+            return;
         }
-        terminalOutput << "(" << static_cast<int>(route.drivingTime) << ")\n";
-        fileOutput << "(" << static_cast<int>(route.drivingTime) << ")\n";
+        outputFile << fileOutput.str();
+        outputFile.close();
 
-        terminalOutput << "ParkingNode:" << route.parkingNode << "\n";
-        fileOutput << "ParkingNode:" << route.parkingNode << "\n";
-
-        terminalOutput << "WalkingRoute:";
-        fileOutput << "WalkingRoute:";
-        for (size_t i = 0; i < route.walkingRoute.size(); i++) {
-            terminalOutput << route.walkingRoute[i];
-            fileOutput << route.walkingRoute[i];
-            if (i < route.walkingRoute.size() - 1) {
-                terminalOutput << ",";
-                fileOutput << ",";
-            }
-        }
-        terminalOutput << "(" << static_cast<int>(route.walkingTime) << ")\n";
-        fileOutput << "(" << static_cast<int>(route.walkingTime) << ")\n";
-
-        terminalOutput << "TotalTime:(" << static_cast<int>(route.totalTime) << ")\n";
-        fileOutput << "TotalTime:(" << static_cast<int>(route.totalTime) << ")\n";
+        // ✅ Chama automaticamente a função de aproximação
+        cout << "\nNo suitable route found. Looking for approximate solutions...\n";
+        approximateSolutions(source, destination, maxWalkTime, avoidNodes, avoidSegments);
+        return;
     }
 
-    // print no terminal
+    // Success case
+    terminalOutput << "DrivingRoute:";
+    fileOutput << "DrivingRoute:";
+    for (size_t i = 0; i < route.drivingRoute.size(); i++) {
+        terminalOutput << route.drivingRoute[i];
+        fileOutput << route.drivingRoute[i];
+        if (i < route.drivingRoute.size() - 1) {
+            terminalOutput << ",";
+            fileOutput << ",";
+        }
+    }
+    terminalOutput << "(" << static_cast<int>(route.drivingTime) << ")\n";
+    fileOutput << "(" << static_cast<int>(route.drivingTime) << ")\n";
+
+    terminalOutput << "ParkingNode:" << route.parkingNode << "\n";
+    fileOutput << "ParkingNode:" << route.parkingNode << "\n";
+
+    terminalOutput << "WalkingRoute:";
+    fileOutput << "WalkingRoute:";
+    for (size_t i = 0; i < route.walkingRoute.size(); i++) {
+        terminalOutput << route.walkingRoute[i];
+        fileOutput << route.walkingRoute[i];
+        if (i < route.walkingRoute.size() - 1) {
+            terminalOutput << ",";
+            fileOutput << ",";
+        }
+    }
+    terminalOutput << "(" << static_cast<int>(route.walkingTime) << ")\n";
+    fileOutput << "(" << static_cast<int>(route.walkingTime) << ")\n";
+
+    terminalOutput << "TotalTime:(" << static_cast<int>(route.totalTime) << ")\n";
+    fileOutput << "TotalTime:(" << static_cast<int>(route.totalTime) << ")\n";
+
     cout << terminalOutput.str();
     cout << "Results written to output.txt" << endl;
 
-    // guardar em output.txt
-    ofstream outputFile("/home/martagfmartins/Desktop/faculdade/da/project1_DA/output.txt", ios::trunc);
+    ofstream outputFile("output.txt", ios::trunc);
     if (!outputFile.is_open()) {
         cerr << "Error: Could not write output.txt" << endl;
         return;
@@ -514,152 +546,110 @@ void Menu::bestDrivingWalkingRoute() {
 }
 
 
-void Menu::approximateSolutions() {
-    cout << "Approximate Solutions selected." << endl;
-    GraphInterface graphInterface;
-
-    // Load dataset
-    graphInterface.loadLocations("/home/martagfmartins/Desktop/faculdade/da/project1_DA/smallDataset2/smallLocations2.csv");
-    graphInterface.loadDistances("/home/martagfmartins/Desktop/faculdade/da/project1_DA/smallDataset2/smallDistances2.csv");
-    Graph<string>& graph = graphInterface.getGraph();
-    const unordered_map<string, bool>& parkingInfo = graphInterface.getParkingInfo();
-
-    DrivingWalkingRoutePlanning dwPlanner(graph, parkingInfo);
-
-    string source, destination;
-    int maxWalkTime;
-    unordered_set<string> avoidNodes;
-    vector<pair<string, string>> avoidSegments;
-
-    cout << "Enter Source Location ID: ";
-    cin >> source;
-    cout << "Enter Destination Location ID: ";
-    cin >> destination;
-    cout << "Enter Maximum Walking Time: ";
-    cin >> maxWalkTime;
-    cin.ignore(); // clear newline
-
-    source = toUpper(source);
-    destination = toUpper(destination);
-
-    cout << "Enter avoid nodes (comma separated, or leave empty): ";
-    string avoidNodesInput;
-    getline(cin, avoidNodesInput);
-    if (!avoidNodesInput.empty()) {
-        if (!isValidAvoidNodesFormat(avoidNodesInput)) {
-            cout << "Error: Invalid format for avoid nodes." << endl;
-            return;
-        }
-        vector<string> nodes = parseAvoidNodes(avoidNodesInput, *(new bool(true)));
-        for (auto &token : nodes) {
-            avoidNodes.insert(toUpper(token));
-        }
-    }
-
-    cout << "Enter avoid segments (format: (id,id),(id,id) or leave empty): ";
-    string avoidSegmentsInput;
-    getline(cin, avoidSegmentsInput);
-    if (!avoidSegmentsInput.empty()) {
-        if (!isValidAvoidSegmentsFormat(avoidSegmentsInput)) {
-            cout << "Error: Invalid format for avoid segments." << endl;
-            return;
-        }
-        avoidSegments = parseAvoidSegments(avoidSegmentsInput, *(new bool(true)));
-        for (auto &seg : avoidSegments) {
-            seg.first = toUpper(seg.first);
-            seg.second = toUpper(seg.second);
-        }
-    }
-
-    // Write input.txt
-    ofstream inputFile("/home/martagfmartins/Desktop/faculdade/da/project1_DA/input.txt", ios::trunc);
-    if (!inputFile.is_open()) {
-        cerr << "Error: Could not write input.txt" << endl;
+void Menu::approximateSolutions(const string& source, const string& destination,
+                                int maxWalkTime,
+                                const unordered_set<string>& avoidNodes,
+                                const vector<pair<string, string>>& avoidSegments) {
+    if (!graph || !parkingInfo) {
+        cerr << "Error: Graph or parking data not loaded.\n";
         return;
     }
-    inputFile << "Mode:driving-walking\n";
-    inputFile << "Source:" << source << "\n";
-    inputFile << "Destination:" << destination << "\n";
-    inputFile << "MaxWalkTime:" << maxWalkTime << "\n";
-    inputFile << "AvoidNodes:" << avoidNodesInput << "\n";
-    inputFile << "AvoidSegments:" << avoidSegmentsInput << "\n";
-    inputFile.close();
 
-    // Process
+    DrivingWalkingRoutePlanning dwPlanner(*graph, *parkingInfo);
+
+    // Obter até 2 rotas alternativas
     auto alternatives = dwPlanner.findApproximateRoutes(source, destination, maxWalkTime, avoidNodes, avoidSegments);
 
-    // Build output
-    stringstream output;
-    output << "\n===== Approximate Routes =====\n";
-    if (alternatives.empty()) {
-        output << "No approximate routes found.\n";
-    } else {
-        for (size_t i = 0; i < alternatives.size(); i++) {
-            output << "DrivingRoute" << i + 1 << ":";
-            for (size_t j = 0; j < alternatives[i].drivingRoute.size(); j++) {
-                output << alternatives[i].drivingRoute[j];
-                if (j < alternatives[i].drivingRoute.size() - 1) output << ",";
-            }
-            output << "(" << static_cast<int>(alternatives[i].drivingTime) << ")\n";
+    // Terminal header
+    stringstream terminalOutput;
+    terminalOutput << "\n===== Approximate Routes =====\n";
 
-            output << "ParkingNode" << i + 1 << ":" << alternatives[i].parkingNode << "\n";
-
-            output << "WalkingRoute" << i + 1 << ":";
-            for (size_t j = 0; j < alternatives[i].walkingRoute.size(); j++) {
-                output << alternatives[i].walkingRoute[j];
-                if (j < alternatives[i].walkingRoute.size() - 1) output << ",";
-            }
-            output << "(" << static_cast<int>(alternatives[i].walkingTime) << ")\n";
-
-            output << "TotalTime" << i + 1 << ":(" << static_cast<int>(alternatives[i].totalTime) << ")\n";
-        }
-    }
-
-    // Output to terminal
-    cout << output.str();
-
-    // Write output.txt
-    ofstream outputFile("/home/martagfmartins/Desktop/faculdade/da/project1_DA/output.txt", ios::trunc);
+    // Write header to file
+    ofstream outputFile("output.txt", ios::trunc);
     if (!outputFile.is_open()) {
         cerr << "Error: Could not write output.txt" << endl;
         return;
     }
+
     outputFile << "Source:" << source << "\n";
     outputFile << "Destination:" << destination << "\n";
+
     if (alternatives.empty()) {
-        outputFile << "DrivingRoute1:none\n";
-        outputFile << "ParkingNode1:none\n";
-        outputFile << "WalkingRoute1:none\n";
-        outputFile << "TotalTime1:\n";
-        outputFile << "DrivingRoute2:none\n";
-        outputFile << "ParkingNode2:none\n";
-        outputFile << "WalkingRoute2:none\n";
-        outputFile << "TotalTime2:\n";
+        terminalOutput << "No approximate routes found.\n";
+
+        for (int i = 1; i <= 2; ++i) {
+            terminalOutput << "DrivingRoute" << i << ":none\n";
+            terminalOutput << "ParkingNode" << i << ":none\n";
+            terminalOutput << "WalkingRoute" << i << ":none\n";
+            terminalOutput << "TotalTime" << i << ":\n";
+
+            outputFile << "DrivingRoute" << i << ":none\n";
+            outputFile << "ParkingNode" << i << ":none\n";
+            outputFile << "WalkingRoute" << i << ":none\n";
+            outputFile << "TotalTime" << i << ":\n";
+        }
     } else {
-        for (size_t i = 0; i < alternatives.size(); i++) {
+        for (size_t i = 0; i < alternatives.size(); ++i) {
+            const auto& alt = alternatives[i];
+
+            // Driving Route
+            terminalOutput << "DrivingRoute" << i + 1 << ":";
             outputFile << "DrivingRoute" << i + 1 << ":";
-            for (size_t j = 0; j < alternatives[i].drivingRoute.size(); j++) {
-                outputFile << alternatives[i].drivingRoute[j];
-                if (j < alternatives[i].drivingRoute.size() - 1) outputFile << ",";
+            for (size_t j = 0; j < alt.drivingRoute.size(); ++j) {
+                terminalOutput << alt.drivingRoute[j];
+                outputFile << alt.drivingRoute[j];
+                if (j < alt.drivingRoute.size() - 1) {
+                    terminalOutput << ",";
+                    outputFile << ",";
+                }
             }
-            outputFile << "(" << static_cast<int>(alternatives[i].drivingTime) << ")\n";
+            terminalOutput << "(" << static_cast<int>(alt.drivingTime) << ")\n";
+            outputFile << "(" << static_cast<int>(alt.drivingTime) << ")\n";
 
-            outputFile << "ParkingNode" << i + 1 << ":" << alternatives[i].parkingNode << "\n";
+            // Parking Node
+            terminalOutput << "ParkingNode" << i + 1 << ":" << alt.parkingNode << "\n";
+            outputFile << "ParkingNode" << i + 1 << ":" << alt.parkingNode << "\n";
 
+            // Walking Route
+            terminalOutput << "WalkingRoute" << i + 1 << ":";
             outputFile << "WalkingRoute" << i + 1 << ":";
-            for (size_t j = 0; j < alternatives[i].walkingRoute.size(); j++) {
-                outputFile << alternatives[i].walkingRoute[j];
-                if (j < alternatives[i].walkingRoute.size() - 1) outputFile << ",";
+            for (size_t j = 0; j < alt.walkingRoute.size(); ++j) {
+                terminalOutput << alt.walkingRoute[j];
+                outputFile << alt.walkingRoute[j];
+                if (j < alt.walkingRoute.size() - 1) {
+                    terminalOutput << ",";
+                    outputFile << ",";
+                }
             }
-            outputFile << "(" << static_cast<int>(alternatives[i].walkingTime) << ")\n";
+            terminalOutput << "(" << static_cast<int>(alt.walkingTime) << ")\n";
+            outputFile << "(" << static_cast<int>(alt.walkingTime) << ")\n";
 
-            outputFile << "TotalTime" << i + 1 << ":(" << static_cast<int>(alternatives[i].totalTime) << ")\n";
+            // Total Time
+            terminalOutput << "TotalTime" << i + 1 << ":(" << static_cast<int>(alt.totalTime) << ")\n";
+            outputFile << "TotalTime" << i + 1 << ":(" << static_cast<int>(alt.totalTime) << ")\n";
+        }
+
+        // Caso apenas uma solução tenha sido encontrada, ainda assim mostrar a segunda como none
+        if (alternatives.size() == 1) {
+            terminalOutput << "DrivingRoute2:none\n";
+            terminalOutput << "ParkingNode2:none\n";
+            terminalOutput << "WalkingRoute2:none\n";
+            terminalOutput << "TotalTime2:\n";
+
+            outputFile << "DrivingRoute2:none\n";
+            outputFile << "ParkingNode2:none\n";
+            outputFile << "WalkingRoute2:none\n";
+            outputFile << "TotalTime2:\n";
         }
     }
 
-    outputFile.close();
+    // Mostrar no terminal e finalizar
+    cout << terminalOutput.str();
     cout << "Results written to output.txt" << endl;
+    outputFile.close();
 }
+
+
 
 
 void Menu::end() {

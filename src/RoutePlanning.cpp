@@ -160,7 +160,7 @@ vector<string> RoutePlanning::dijkstra(const string& sourceLocation, const strin
 
 
 pair<vector<string>, vector<string>> RoutePlanning::findIndependentRoutes(const string& sourceLocation, const string& destinationLocation, double& bestRouteTime, double& alternativeRouteTime) {
-    // Validate the existence of source and destination
+    // Verifica se source e destination existem
     Vertex<string>* sourceVertex = graph.findVertex(sourceLocation);
     Vertex<string>* destinationVertex = graph.findVertex(destinationLocation);
 
@@ -169,41 +169,27 @@ pair<vector<string>, vector<string>> RoutePlanning::findIndependentRoutes(const 
         return { {}, {} };
     }
 
-    // Find the best route
+    // Encontra a melhor rota (mais rápida)
     vector<string> bestRoute = dijkstra(sourceLocation, destinationLocation, bestRouteTime);
-
     if (bestRoute.empty()) {
         cerr << "No valid best route found!" << endl;
         return { {}, {} };
     }
 
-    // Temporarily remove edges in the best route
-    vector<pair<string, string>> removedEdges;
-    vector<pair<string, double>> edgeWeights;
-
-    for (size_t i = 0; i < bestRoute.size() - 1; i++) {
-        Vertex<string>* vertex = graph.findVertex(bestRoute[i]);
-        if (vertex) {
-            for (auto edge : vertex->getAdj()) {
-                if (edge->getDest()->getInfo() == bestRoute[i + 1]) {
-                    removedEdges.push_back({edge->getOrig()->getInfo(), edge->getDest()->getInfo()});
-                    edgeWeights.push_back({edge->getOrig()->getInfo(), edge->getDriving()});
-                }
-            }
-        }
+    // Cria um conjunto com os nós intermediários da melhor rota (exclui source e destination)
+    unordered_set<string> avoidNodes;
+    for (size_t i = 1; i < bestRoute.size() - 1; ++i) {
+        avoidNodes.insert(bestRoute[i]);
     }
 
-    // Remove edges
-    for (auto edgePair : removedEdges) {
-        graph.removeEdge(edgePair.first, edgePair.second);
-    }
+    // Encontra rota alternativa, evitando os nós da melhor rota
+    vector<string> alternativeRoute = dijkstra(sourceLocation, destinationLocation, alternativeRouteTime, avoidNodes);
 
-    // Find the alternative route
-    vector<string> alternativeRoute = dijkstra(sourceLocation, destinationLocation, alternativeRouteTime);
-
-    // Restore removed edges
-    for (size_t i = 0; i < removedEdges.size(); i++) {
-        graph.addEdge(removedEdges[i].first, removedEdges[i].second, edgeWeights[i].second, 0);
+    // Verifica se a rota alternativa é válida e tem tempo >= tempo da principal
+    if (!alternativeRoute.empty() && alternativeRouteTime < bestRouteTime) {
+        // Se for mais rápida, então não é válida -> rejeitar
+        alternativeRoute.clear();
+        alternativeRouteTime = 0.0;
     }
 
     return { bestRoute, alternativeRoute };
@@ -280,4 +266,5 @@ vector<string> RoutePlanning::findRestrictedRoute(const string& sourceLocation, 
 
     return finalRoute;
 }
+
 

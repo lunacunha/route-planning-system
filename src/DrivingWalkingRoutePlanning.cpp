@@ -8,6 +8,7 @@
 #include <cmath>
 #include <tuple>
 #include <algorithm>
+#include <numeric>
 using namespace std;
 
 DrivingWalkingRoutePlanning::DrivingWalkingRoutePlanning(Graph<string>& graph, const unordered_map<string, bool>& parkingInfo)
@@ -166,18 +167,6 @@ DrivingWalkingRoute DrivingWalkingRoutePlanning::findBestRoute(const string& sou
         if (find(drivingRoute.begin(), drivingRoute.end(), destination) != drivingRoute.end())
             continue;
 
-       /* // Verifica se há algum nó de estacionamento intermediário na rota de condução.
-        bool intermediateParkingFound = false;
-        for (size_t i = 1; i < drivingRoute.size() - 1; i++) {
-            string intermediate = drivingRoute[i];
-            if (parkingInfo.find(intermediate) != parkingInfo.end() && parkingInfo.at(intermediate)) {
-                intermediateParkingFound = true;
-                break;
-            }
-        }
-        if (intermediateParkingFound)
-            continue;
-        */
         // Calcula a rota de caminhada do nó candidato (parking) até o destination.
         double walkingTime = 0.0;
         vector<string> walkingRoute = dijkstraWalking(node, destination, walkingTime, avoidNodes);
@@ -216,26 +205,40 @@ DrivingWalkingRoute DrivingWalkingRoutePlanning::findBestRoute(const string& sou
 }
 
 
-vector<DrivingWalkingRoute> DrivingWalkingRoutePlanning::findApproximateRoutes(const string& source, const string& destination,
-                                                      int maxWalkTime,
-                                                      const unordered_set<string>& avoidNodes,
-                                                      const vector<pair<string, string>>& avoidSegments) {
+vector<DrivingWalkingRoute> DrivingWalkingRoutePlanning::findApproximateRoutes(
+    const string& source, const string& destination,
+    int maxWalkTime,
+    const unordered_set<string>& avoidNodes,
+    const vector<pair<string, string>>& avoidSegments) {
+
     vector<DrivingWalkingRoute> suggestions;
-    // Relax the maximum walking time constraint by fixed increments (e.g., +5 and +10).
-    int increments[2] = { maxWalkTime + 5, maxWalkTime + 10 };
-    
-    for (int newMaxWalk : increments) {
+    unordered_set<string> seenHashes; // For detecting duplicates
+
+    // Try with incremental relaxations
+    vector<int> increments = { maxWalkTime + 5, maxWalkTime + 10, maxWalkTime + 15, maxWalkTime + 20 };
+
+    for (int newMaxWalkTime : increments) {
         string dummyError;
-        DrivingWalkingRoute route = findBestRoute(source, destination, newMaxWalk, avoidNodes, avoidSegments, dummyError);
+        DrivingWalkingRoute route = findBestRoute(source, destination, newMaxWalkTime, avoidNodes, avoidSegments, dummyError);
+
         if (!route.drivingRoute.empty() && !route.walkingRoute.empty() && !route.parkingNode.empty()) {
-            suggestions.push_back(route);
-            if (suggestions.size() == 2)
-                break;
+            // Create a unique hash string to detect duplicates
+            string hash = route.parkingNode + "|" +
+                          accumulate(route.drivingRoute.begin(), route.drivingRoute.end(), string()) + "|" +
+                          accumulate(route.walkingRoute.begin(), route.walkingRoute.end(), string());
+
+            if (seenHashes.count(hash) == 0) {
+                seenHashes.insert(hash);
+                suggestions.push_back(route);
+            }
         }
+
+        if (suggestions.size() == 2) break;
     }
-    // Sort suggestions by overall total time.
+
     sort(suggestions.begin(), suggestions.end(), [](const DrivingWalkingRoute& a, const DrivingWalkingRoute& b) {
         return a.totalTime < b.totalTime;
     });
+
     return suggestions;
 }

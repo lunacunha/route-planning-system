@@ -17,10 +17,12 @@ struct DrivingWalkingRoute {
     double drivingTime;
     double walkingTime;
     double totalTime;
+    int usedMaxWalkTime;
 };
 
 class DrivingWalkingRoutePlanning {
 public:
+
     // Constructor receives a reference to the graph and a parking info mapping.
     DrivingWalkingRoutePlanning(Graph<string>& graph, const unordered_map<string, bool>& parkingInfo);
     
