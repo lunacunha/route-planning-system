@@ -9,6 +9,7 @@
 #include <tuple>
 #include <algorithm>
 #include <numeric>
+#include <string>
 using namespace std;
 
 DrivingWalkingRoutePlanning::DrivingWalkingRoutePlanning(Graph<string>& graph, const unordered_map<string, bool>& parkingInfo)
@@ -199,7 +200,7 @@ DrivingWalkingRoute DrivingWalkingRoutePlanning::findBestRoute(const string& sou
     }
 
     if (!routeFound)
-        errorMessage = "No valid driving-walking route found that meets the requirements.";
+        errorMessage = "No possible route with max. walking time of "+ to_string(maxWalkTime) + " minutes";
 
     return bestRoute;
 }
