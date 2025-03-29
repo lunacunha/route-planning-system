@@ -14,7 +14,6 @@
 #include <string>
 #include <unordered_set>
 using namespace std;
-#define INF std::numeric_limits<double>::max()
 
 class RoutePlanning {
     public:

@@ -6,7 +6,7 @@
 
 
 GraphInterface::GraphInterface() {
-    graph = Graph<string>(); // Inicializar o grafo
+    graph = Graph<string>();
 }
 
 
@@ -25,7 +25,7 @@ void GraphInterface::loadLocations(const string &filename) {
     }
 
     string line;
-    getline(fileToLoad, line); // Ignorar cabeçalho
+    getline(fileToLoad, line); // ignores header
 
     while (getline(fileToLoad, line)) {
         istringstream iss(line);
@@ -61,7 +61,7 @@ void GraphInterface::loadDistances(const string &filename) {
     }
 
     string line;
-    getline(fileToLoad, line); // Ignorar cabeçalho
+    getline(fileToLoad, line); // ignores header
 
     while (getline(fileToLoad, line)) {
         istringstream iss(line);
@@ -94,7 +94,7 @@ void GraphInterface::loadDistances(const string &filename) {
             walkingTime = stoi(elements[3]);
         }
 
-        // Só adiciona aresta se pelo menos um dos tempos for válido
+        // only adds edge is at least one of the times is valid
         if (drivingTime >= 0 || walkingTime >= 0) {
             graph.addEdge(location1, location2, drivingTime, walkingTime);
         }

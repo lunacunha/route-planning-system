@@ -7,25 +7,29 @@
 #include <algorithm>
 #include <cctype>
 
-// Verifica se avoid nodes NÃO contém parênteses.
-bool isValidAvoidNodesFormat(const std::string &input) {
-    return (input.find('(') == std::string::npos && input.find(')') == std::string::npos);
+using namespace std;
+
+// checks if avoid nodes do not have parentheses
+bool isValidAvoidNodesFormat(const string &input) {
+    return (input.find('(') == string::npos && input.find(')') == string::npos);
 }
 
-std::vector<std::string> parseAvoidNodes(const std::string &input, bool &valid) {
-    std::vector<std::string> result;
+vector<string> parseAvoidNodes(const string &input, bool &valid) {
+    vector<string> result;
     valid = isValidAvoidNodesFormat(input);
-    if (!valid) return result;
+    if (!valid) {
+        return result;
+    }
 
-    std::istringstream iss(input);
-    std::string token;
+    istringstream iss(input);
+    string token;
     while (getline(iss, token, ',')) {
-        // Remove espaços extras no início e fim.
-        token.erase(token.begin(), std::find_if(token.begin(), token.end(), [](unsigned char ch) {
-            return !std::isspace(ch);
+        // removes extra spaces
+        token.erase(token.begin(), find_if(token.begin(), token.end(), [](unsigned char ch) {
+            return !isspace(ch);
         }));
-        token.erase(std::find_if(token.rbegin(), token.rend(), [](unsigned char ch) {
-            return !std::isspace(ch);
+        token.erase(find_if(token.rbegin(), token.rend(), [](unsigned char ch) {
+            return !isspace(ch);
         }).base(), token.end());
         if (!token.empty())
             result.push_back(token);
@@ -33,64 +37,67 @@ std::vector<std::string> parseAvoidNodes(const std::string &input, bool &valid) 
     return result;
 }
 
-// Verifica se a string de avoid segments está no formato: (id,id),(id,id),...
-bool isValidAvoidSegmentsFormat(const std::string &input) {
+// checks if string avoid segments is in the right format -> (id,id),(id,id),...
+bool isValidAvoidSegmentsFormat(const string &input) {
     if (input.empty())
         return true;
-    // Deve conter pelo menos um '(' e um ')'
-    if (input.find('(') == std::string::npos || input.find(')') == std::string::npos)
+    // it needs to have at least 1 '(' and 1 ')'
+    if (input.find('(') == string::npos || input.find(')') == string::npos)
         return false;
 
     size_t pos = 0;
     while (pos < input.size()) {
         size_t openPos = input.find('(', pos);
-        if (openPos == std::string::npos)
+        if (openPos == string::npos)
             break;
+
         size_t closePos = input.find(')', openPos);
-        if (closePos == std::string::npos)
+        if (closePos == string::npos)
             return false;
-        std::string segment = input.substr(openPos + 1, closePos - openPos - 1);
+
+        string segment = input.substr(openPos + 1, closePos - openPos - 1);
         size_t commaPos = segment.find(',');
-        if (commaPos == std::string::npos)
+        if (commaPos == string::npos)
             return false;
-        // Verifica se há mais de uma vírgula.
-        if (segment.find(',', commaPos + 1) != std::string::npos)
+        // checks if it has more than 1 comma
+        if (segment.find(',', commaPos + 1) != string::npos)
             return false;
         pos = closePos + 1;
-        // Pula vírgulas que se seguem.
+        // ignores next commas
         if (pos < input.size() && input[pos] == ',')
             pos++;
     }
     return true;
 }
 
-std::vector<std::pair<std::string, std::string>> parseAvoidSegments(const std::string &input, bool &valid) {
-    std::vector<std::pair<std::string, std::string>> result;
+vector<pair<string, string>> parseAvoidSegments(const string &input, bool &valid) {
+    vector<pair<string, string>> result;
     valid = isValidAvoidSegmentsFormat(input);
     if (!valid)
         return result;
 
     size_t pos = 0;
-    std::string working = input;
-    while ((pos = working.find("(")) != std::string::npos) {
+    string working = input;
+    while ((pos = working.find("(")) != string::npos) {
         size_t endPos = working.find(")", pos);
-        if (endPos == std::string::npos) {
+        if (endPos == string::npos) {
             valid = false;
             return result;
         }
-        std::string segment = working.substr(pos + 1, endPos - pos - 1);
+        string segment = working.substr(pos + 1, endPos - pos - 1);
         size_t commaPos = segment.find(",");
-        if (commaPos == std::string::npos) {
+        if (commaPos == string::npos) {
             valid = false;
             return result;
         }
-        std::string from = segment.substr(0, commaPos);
-        std::string to = segment.substr(commaPos + 1);
-        // Remove espaços extras
-        from.erase(from.begin(), std::find_if(from.begin(), from.end(), [](unsigned char ch){ return !std::isspace(ch); }));
-        from.erase(std::find_if(from.rbegin(), from.rend(), [](unsigned char ch){ return !std::isspace(ch); }).base(), from.end());
-        to.erase(to.begin(), std::find_if(to.begin(), to.end(), [](unsigned char ch){ return !std::isspace(ch); }));
-        to.erase(std::find_if(to.rbegin(), to.rend(), [](unsigned char ch){ return !std::isspace(ch); }).base(), to.end());
+        string from = segment.substr(0, commaPos);
+        string to = segment.substr(commaPos + 1);
+
+        // removes extra spaces
+        from.erase(from.begin(), find_if(from.begin(), from.end(), [](unsigned char ch){ return !isspace(ch); }));
+        from.erase(find_if(from.rbegin(), from.rend(), [](unsigned char ch){ return !isspace(ch); }).base(), from.end());
+        to.erase(to.begin(), find_if(to.begin(), to.end(), [](unsigned char ch){ return !isspace(ch); }));
+        to.erase(find_if(to.rbegin(), to.rend(), [](unsigned char ch){ return !isspace(ch); }).base(), to.end());
 
         result.push_back({from, to});
         working.erase(0, endPos + 1);

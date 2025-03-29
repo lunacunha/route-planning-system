@@ -23,18 +23,18 @@ struct DrivingWalkingRoute {
 class DrivingWalkingRoutePlanning {
 public:
 
-    // Constructor receives a reference to the graph and a parking info mapping.
+    // constructor receives a reference to the graph and a parking info mapping
     DrivingWalkingRoutePlanning(Graph<string>& graph, const unordered_map<string, bool>& parkingInfo);
     
-    // Finds the best route based on overall travel time (with tie-breaker on walking time).
-    // On failure, errorMessage is set and returned route segments will be empty.
+    // finds the best route based on overall travel time (with tie-breaker on walking time)
+    // if failure -> errorMessage is set and returned route segments will be empty
     DrivingWalkingRoute findBestRoute(const string& source, const string& destination, 
                                       int maxWalkTime, 
                                       const unordered_set<string>& avoidNodes, 
                                       const vector<pair<string, string>>& avoidSegments,
                                       string& errorMessage);
     
-    // Provides up to 2 alternative routes (approximate solutions) that relax the walking time constraint.
+    // provides up to 2 alternative routes (approximate solutions) that relax the walking time constraint
     vector<DrivingWalkingRoute> findApproximateRoutes(const string& source, const string& destination, 
                                                       int maxWalkTime, 
                                                       const unordered_set<string>& avoidNodes, 
@@ -50,10 +50,10 @@ private:
     Graph<string>& graph;
     const unordered_map<string, bool>& parkingInfo;
     
-    // Helper: Dijkstra for walking segments using walking edge weights.
+    // Helper: Dijkstra for walking segments using walking edge weights
     vector<string> dijkstraWalking(const string& src, const string& dest, double& walkingTime, const unordered_set<string>& avoidNodes);
     
-    // Helper: Uses the driving cost to compute driving segments.
+    // Helper: Uses the driving cost to compute driving segments
     vector<string> dijkstraDriving(const string& src, const string& dest, double& drivingTime, const unordered_set<string>& avoidNodes);
 };
 

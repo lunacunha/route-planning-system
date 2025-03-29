@@ -15,7 +15,7 @@ DrivingWalkingRoutePlanning::DrivingWalkingRoutePlanning(Graph<string>& graph, c
     : graph(graph), parkingInfo(parkingInfo)
 {}
 
-// Dijkstra for walking segments using walking weights.
+// Dijkstra for walking segments using walking weights
 vector<string> DrivingWalkingRoutePlanning::dijkstraWalking(const string& src, const string& dest, double& walkingTime, const unordered_set<string>& avoidNodes) {
     unordered_map<string, double> minDist;
     unordered_map<string, string> prev;
@@ -73,15 +73,15 @@ vector<string> DrivingWalkingRoutePlanning::dijkstraWalking(const string& src, c
         cur = prev[cur];
     }
 
-    // Ensure that the walking route has at least one edge.
+    // Ensure that the walking route has at least 1 edge
     if (path.size() < 2)
         return {};
 
     return path;
 }
 
-// Helper for driving route: reuses the existing RoutePlanning::dijkstra.
-// Note: We use a temporary RoutePlanning object.
+// Helper for driving route: reuses the existing RoutePlanning::dijkstra
+// Note: we use a temporary RoutePlanning object
 vector<string> DrivingWalkingRoutePlanning::dijkstraDriving(const string& src, const string& dest, double& drivingTime, const unordered_set<string>& avoidNodes) {
     RoutePlanning rp(graph);
     vector<string> route = rp.dijkstra(src, dest, drivingTime, avoidNodes);
@@ -100,7 +100,7 @@ DrivingWalkingRoute DrivingWalkingRoutePlanning::findBestRoute(const string& sou
     bestRoute.totalTime = numeric_limits<double>::max();
     errorMessage = "";
 
-    // Validação da existência de source e destination.
+    // validates the existence of source and destination
     auto srcVertex = graph.findVertex(source);
     auto destVertex = graph.findVertex(destination);
     if (!srcVertex || !destVertex) {
@@ -108,7 +108,7 @@ DrivingWalkingRoute DrivingWalkingRoutePlanning::findBestRoute(const string& sou
         return bestRoute;
     }
 
-    // A origem e o destino não podem ser nós com estacionamento.
+    // source and destination cannot have parking
     if (parkingInfo.find(source) != parkingInfo.end() && parkingInfo.at(source)) {
         errorMessage = "Source is a parking node.";
         return bestRoute;
@@ -118,7 +118,7 @@ DrivingWalkingRoute DrivingWalkingRoutePlanning::findBestRoute(const string& sou
         return bestRoute;
     }
 
-    // A origem e o destino não podem ser nós adjacentes.
+    // source and destination cannot be adj
     bool adjacent = false;
     for (const auto edge : srcVertex->getAdj()) {
         if (edge->getDest()->getInfo() == destination) {
@@ -131,7 +131,7 @@ DrivingWalkingRoute DrivingWalkingRoutePlanning::findBestRoute(const string& sou
         return bestRoute;
     }
 
-    // Processa os avoidSegments: remove temporariamente essas arestas.
+    // processes avoidSegments: removes those edges temporarily
     vector<tuple<string, string, double, double>> removedEdges;
     for (const auto& seg : avoidSegments) {
         auto v1 = graph.findVertex(seg.first);
@@ -146,39 +146,39 @@ DrivingWalkingRoute DrivingWalkingRoutePlanning::findBestRoute(const string& sou
         }
     }
 
-    // Itera pelos nós candidatos para estacionamento (apenas os que têm estacionamento disponível).
+    // goes through possible parking nodes (those with parking available)
     auto vertices = graph.getVertexSet();
     bool routeFound = false;
     for (const auto vertex : vertices) {
         string node = vertex->getInfo();
         if (node == source || node == destination)
             continue;
-        // O nó candidato deve ter estacionamento disponível.
+        // it has to have parking available
         if (parkingInfo.find(node) == parkingInfo.end() || !parkingInfo.at(node))
             continue;
 
-        // Calcula a rota de condução de source até o nó candidato.
+        // route from source to candidate
         double drivingTime = 0.0;
         vector<string> drivingRoute = dijkstraDriving(source, node, drivingTime, avoidNodes);
         if (drivingRoute.empty())
             continue;
 
-        // Garante que a rota de condução não passe pelo destination.
+        // route cannot go through destination
         if (find(drivingRoute.begin(), drivingRoute.end(), destination) != drivingRoute.end())
             continue;
 
-        // Calcula a rota de caminhada do nó candidato (parking) até o destination.
+        // route from candidate (parking) to destination
         double walkingTime = 0.0;
         vector<string> walkingRoute = dijkstraWalking(node, destination, walkingTime, avoidNodes);
         if (walkingRoute.empty())
             continue;
 
-        // Verifica se ambos os segmentos possuem pelo menos uma aresta e se o tempo de caminhada está dentro do limite.
+        // checks if both segments have at leats 1 edge and if walking time is within the limit
         if (drivingRoute.size() < 2 || walkingRoute.size() < 2 || walkingTime > maxWalkTime)
             continue;
 
         double totalTime = drivingTime + walkingTime;
-        // Seleciona a rota com o menor tempo total; em caso de empate, escolhe a com maior tempo de caminhada.
+        // chooses the route with the lowest total time
         if (totalTime < bestRoute.totalTime || (fabs(totalTime - bestRoute.totalTime) < 1e-6 && walkingTime > bestRoute.walkingTime)) {
             bestRoute.drivingRoute = drivingRoute;
             bestRoute.parkingNode = node;
@@ -190,7 +190,7 @@ DrivingWalkingRoute DrivingWalkingRoutePlanning::findBestRoute(const string& sou
         }
     }
 
-    // Restaura as arestas removidas temporariamente (avoidSegments).
+    // recoves the edges that were temporarily removed (avoid segments)
     for (const auto& seg : removedEdges) {
         string from, to;
         double d, w;
@@ -256,13 +256,13 @@ vector<DrivingWalkingRoute> DrivingWalkingRoutePlanning::findAllValidRoutes(
         (parkingInfo.find(destination) != parkingInfo.end() && parkingInfo.at(destination)))
         return validRoutes;
 
-    // Check if source and destination are adjacent
+    // checks if source and destination are adjacent
     for (const auto& edge : srcVertex->getAdj()) {
         if (edge->getDest()->getInfo() == destination)
             return validRoutes;
     }
 
-    // Remove avoidSegments temporarily
+    // removes avoidSegments temporarily
     vector<tuple<string, string, double, double>> removedEdges;
     for (const auto& seg : avoidSegments) {
         auto v1 = graph.findVertex(seg.first);
@@ -303,7 +303,7 @@ vector<DrivingWalkingRoute> DrivingWalkingRoutePlanning::findAllValidRoutes(
         validRoutes.push_back(route);
     }
 
-    // Restore edges
+    // restore edges
     for (const auto& edge : removedEdges) {
         string from, to;
         double d, w;

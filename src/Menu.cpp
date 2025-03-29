@@ -19,7 +19,7 @@ string Menu::trim(const string &s) {
     return (start == string::npos || end == string::npos) ? "" : s.substr(start, end - start + 1);
 }
 
-// Função auxiliar para converter uma string para uppercase.
+// Função auxiliar para converter uma string para uppercase
 string Menu::toUpper(const string &s) {
     string result = s;
     transform(result.begin(), result.end(), result.begin(),
@@ -500,7 +500,7 @@ void Menu::bestDrivingWalkingRoute() {
         outputFile << fileOutput.str();
         outputFile.close();
 
-        // ✅ Chama automaticamente a função de aproximação
+        // calls approximate solution function
         cout << "\nNo suitable route found. Looking for approximate solutions...\n";
         approximateSolutions(source, destination, maxWalkTime, avoidNodes, avoidSegments);
         return;
