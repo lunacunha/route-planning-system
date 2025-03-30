@@ -1,0 +1,42 @@
+\doxysection{Location.\+h}
+\hypertarget{_location_8h_source}{}\label{_location_8h_source}\index{src/Location.h@{src/Location.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{//}}
+\DoxyCodeLine{00002\ \textcolor{comment}{//\ Created\ by\ Luna\ on\ 22/02/2025.}}
+\DoxyCodeLine{00003\ \textcolor{comment}{//}}
+\DoxyCodeLine{00004\ }
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#ifndef\ PROJETO1\_DA\_LOCATION\_H}}
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#define\ PROJETO1\_DA\_LOCATION\_H}}
+\DoxyCodeLine{00007\ }
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{00009\ \textcolor{keyword}{using\ namespace\ }std;}
+\DoxyCodeLine{00010\ }
+\DoxyCodeLine{00011\ \textcolor{keyword}{class\ }Location\ \{}
+\DoxyCodeLine{00012\ }
+\DoxyCodeLine{00013\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00014\ \ \ \ \ \textcolor{keywordtype}{string}\ name;}
+\DoxyCodeLine{00015\ \ \ \ \ \textcolor{keywordtype}{int}\ id;}
+\DoxyCodeLine{00016\ \ \ \ \ \textcolor{keywordtype}{string}\ code;}
+\DoxyCodeLine{00017\ \ \ \ \ \textcolor{keywordtype}{bool}\ hasParking;}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00019\ }
+\DoxyCodeLine{00020\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00021\ \ \ \ \ Location(\textcolor{keywordtype}{string}\ location\_name,\ \textcolor{keywordtype}{int}\ location\_id,\ \textcolor{keywordtype}{string}\ location\_code,\ \textcolor{keywordtype}{bool}\ parking);}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00023\ \ \ \ \ \textcolor{comment}{//\ getter\ functions}}
+\DoxyCodeLine{00024\ \ \ \ \ \textcolor{keywordtype}{string}\ getLocationName()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00025\ \ \ \ \ \textcolor{keywordtype}{int}\ getLocationId()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00026\ \ \ \ \ \textcolor{keywordtype}{string}\ getLocationCode()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00027\ \ \ \ \ \textcolor{keywordtype}{bool}\ getHasParking()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00028\ }
+\DoxyCodeLine{00029\ \ \ \ \ \textcolor{comment}{//\ setter\ functions}}
+\DoxyCodeLine{00030\ \ \ \ \ \textcolor{keywordtype}{void}\ setLocationName(\textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\&\ name);}
+\DoxyCodeLine{00031\ \ \ \ \ \textcolor{keywordtype}{void}\ setLocationId(\textcolor{keywordtype}{int}\ \textcolor{keywordtype}{id});}
+\DoxyCodeLine{00032\ \ \ \ \ \textcolor{keywordtype}{void}\ setLocationCode(\textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\&\ code);}
+\DoxyCodeLine{00033\ \ \ \ \ \textcolor{keywordtype}{void}\ setHasParking(\textcolor{keywordtype}{bool}\ p);}
+\DoxyCodeLine{00034\ \};}
+\DoxyCodeLine{00035\ }
+\DoxyCodeLine{00036\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//PROJETO1\_DA\_LOCATION\_H}}
+
+\end{DoxyCode}

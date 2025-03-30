@@ -1,0 +1,26 @@
+\doxysection{Route\+Planning Class Reference}
+\hypertarget{class_route_planning}{}\label{class_route_planning}\index{RoutePlanning@{RoutePlanning}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_route_planning_aa3fb952874b2b6835cbfddbc105cee0d}\label{class_route_planning_aa3fb952874b2b6835cbfddbc105cee0d} 
+{\bfseries Route\+Planning} (\mbox{\hyperlink{class_graph}{Graph}}$<$ string $>$ \&graph)
+\item 
+\Hypertarget{class_route_planning_a259705e730789267bb2b40a193b0ec10}\label{class_route_planning_a259705e730789267bb2b40a193b0ec10} 
+vector$<$ string $>$ {\bfseries dijkstra} (const string \&source\+Location, const string \&destination\+Location, double \&total\+Travel\+Time)
+\item 
+\Hypertarget{class_route_planning_ab930c8366dcaf614941eba3ef60bdb6c}\label{class_route_planning_ab930c8366dcaf614941eba3ef60bdb6c} 
+vector$<$ string $>$ {\bfseries dijkstra} (const string \&source\+Location, const string \&destination\+Location, double \&total\+Travel\+Time, const unordered\+\_\+set$<$ string $>$ \&avoid\+Nodes)
+\item 
+\Hypertarget{class_route_planning_a028709862eda890195f2e13b4ad7d974}\label{class_route_planning_a028709862eda890195f2e13b4ad7d974} 
+pair$<$ vector$<$ string $>$, vector$<$ string $>$ $>$ {\bfseries find\+Independent\+Routes} (const string \&source\+Location, const string \&destination\+Location, double \&best\+Route\+Time, double \&alternative\+Route\+Time)
+\item 
+\Hypertarget{class_route_planning_a0307e2516274e732f707d4166f241d00}\label{class_route_planning_a0307e2516274e732f707d4166f241d00} 
+vector$<$ string $>$ {\bfseries find\+Restricted\+Route} (const string \&source\+Location, const string \&destination\+Location, const unordered\+\_\+set$<$ string $>$ \&avoid\+Nodes, const vector$<$ pair$<$ string, string $>$ $>$ \&avoid\+Segments, const string \&include\+Node, double \&total\+Travel\+Time)
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/Route\+Planning.\+h\item 
+src/Route\+Planning.\+cpp\end{DoxyCompactItemize}

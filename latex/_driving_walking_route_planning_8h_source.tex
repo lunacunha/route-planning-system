@@ -1,0 +1,66 @@
+\doxysection{Driving\+Walking\+Route\+Planning.\+h}
+\hypertarget{_driving_walking_route_planning_8h_source}{}\label{_driving_walking_route_planning_8h_source}\index{src/DrivingWalkingRoutePlanning.h@{src/DrivingWalkingRoutePlanning.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ DRIVING\_WALKING\_ROUTE\_PLANNING\_H}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ DRIVING\_WALKING\_ROUTE\_PLANNING\_H}}
+\DoxyCodeLine{00003\ }
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#include\ <unordered\_set>}}
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#include\ <unordered\_map>}}
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#include\ <utility>}}
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\#include\ "{}Graph.h"{}}\ \ \textcolor{comment}{//\ Make\ sure\ the\ include\ path\ is\ correct}}
+\DoxyCodeLine{00010\ }
+\DoxyCodeLine{00011\ \textcolor{keyword}{using\ namespace\ }std;}
+\DoxyCodeLine{00012\ }
+\DoxyCodeLine{00013\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_driving_walking_route}{DrivingWalkingRoute}}\ \{}
+\DoxyCodeLine{00014\ \ \ \ \ vector<string>\ drivingRoute;}
+\DoxyCodeLine{00015\ \ \ \ \ \textcolor{keywordtype}{string}\ parkingNode;}
+\DoxyCodeLine{00016\ \ \ \ \ vector<string>\ walkingRoute;}
+\DoxyCodeLine{00017\ \ \ \ \ \textcolor{keywordtype}{double}\ drivingTime;}
+\DoxyCodeLine{00018\ \ \ \ \ \textcolor{keywordtype}{double}\ walkingTime;}
+\DoxyCodeLine{00019\ \ \ \ \ \textcolor{keywordtype}{double}\ totalTime;}
+\DoxyCodeLine{00020\ \ \ \ \ \textcolor{keywordtype}{int}\ usedMaxWalkTime;}
+\DoxyCodeLine{00021\ \};}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00023\ \textcolor{keyword}{class\ }DrivingWalkingRoutePlanning\ \{}
+\DoxyCodeLine{00024\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \ \ \ \ \textcolor{comment}{//\ constructor\ receives\ a\ reference\ to\ the\ graph\ and\ a\ parking\ info\ mapping}}
+\DoxyCodeLine{00027\ \ \ \ \ DrivingWalkingRoutePlanning(\mbox{\hyperlink{class_graph}{Graph<string>}}\&\ graph,\ \textcolor{keyword}{const}\ unordered\_map<string,\ bool>\&\ parkingInfo);}
+\DoxyCodeLine{00028\ \ \ \ \ }
+\DoxyCodeLine{00029\ \ \ \ \ \textcolor{comment}{//\ finds\ the\ best\ route\ based\ on\ overall\ travel\ time\ (with\ tie-\/breaker\ on\ walking\ time)}}
+\DoxyCodeLine{00030\ \ \ \ \ \textcolor{comment}{//\ if\ failure\ -\/>\ errorMessage\ is\ set\ and\ returned\ route\ segments\ will\ be\ empty}}
+\DoxyCodeLine{00031\ \ \ \ \ \mbox{\hyperlink{struct_driving_walking_route}{DrivingWalkingRoute}}\ findBestRoute(\textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\&\ source,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\&\ destination,\ }
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ maxWalkTime,\ }
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ unordered\_set<string>\&\ avoidNodes,\ }
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ vector<pair<string,\ string>>\&\ avoidSegments,}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\&\ errorMessage);}
+\DoxyCodeLine{00036\ \ \ \ \ }
+\DoxyCodeLine{00037\ \ \ \ \ \textcolor{comment}{//\ provides\ up\ to\ 2\ alternative\ routes\ (approximate\ solutions)\ that\ relax\ the\ walking\ time\ constraint}}
+\DoxyCodeLine{00038\ \ \ \ \ vector<DrivingWalkingRoute>\ findApproximateRoutes(\textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\&\ source,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\&\ destination,\ }
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ maxWalkTime,\ }
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ unordered\_set<string>\&\ avoidNodes,\ }
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ vector<pair<string,\ string>>\&\ avoidSegments);}
+\DoxyCodeLine{00042\ \ \ \ \ vector<DrivingWalkingRoute>\ findAllValidRoutes(}
+\DoxyCodeLine{00043\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\&\ source,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\&\ destination,}
+\DoxyCodeLine{00044\ \ \ \ \ \textcolor{keywordtype}{int}\ maxWalkTime,}
+\DoxyCodeLine{00045\ \ \ \ \ \textcolor{keyword}{const}\ unordered\_set<string>\&\ avoidNodes,}
+\DoxyCodeLine{00046\ \ \ \ \ \textcolor{keyword}{const}\ vector<pair<string,\ string>>\&\ avoidSegments)\ ;}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \ \ \ \ }
+\DoxyCodeLine{00049\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00050\ \ \ \ \ \mbox{\hyperlink{class_graph}{Graph<string>}}\&\ graph;}
+\DoxyCodeLine{00051\ \ \ \ \ \textcolor{keyword}{const}\ unordered\_map<string,\ bool>\&\ parkingInfo;}
+\DoxyCodeLine{00052\ \ \ \ \ }
+\DoxyCodeLine{00053\ \ \ \ \ \textcolor{comment}{//\ Helper:\ Dijkstra\ for\ walking\ segments\ using\ walking\ edge\ weights}}
+\DoxyCodeLine{00054\ \ \ \ \ vector<string>\ dijkstraWalking(\textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\&\ src,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\&\ dest,\ \textcolor{keywordtype}{double}\&\ walkingTime,\ \textcolor{keyword}{const}\ unordered\_set<string>\&\ avoidNodes);}
+\DoxyCodeLine{00055\ \ \ \ \ }
+\DoxyCodeLine{00056\ \ \ \ \ \textcolor{comment}{//\ Helper:\ Uses\ the\ driving\ cost\ to\ compute\ driving\ segments}}
+\DoxyCodeLine{00057\ \ \ \ \ vector<string>\ dijkstraDriving(\textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\&\ src,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\&\ dest,\ \textcolor{keywordtype}{double}\&\ drivingTime,\ \textcolor{keyword}{const}\ unordered\_set<string>\&\ avoidNodes);}
+\DoxyCodeLine{00058\ \};}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00060\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ DRIVING\_WALKING\_ROUTE\_PLANNING\_H}}
+
+\end{DoxyCode}

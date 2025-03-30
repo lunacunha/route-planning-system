@@ -1,0 +1,41 @@
+\doxysection{Route\+Planning.\+h}
+\hypertarget{_route_planning_8h_source}{}\label{_route_planning_8h_source}\index{src/RoutePlanning.h@{src/RoutePlanning.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{//}}
+\DoxyCodeLine{00002\ \textcolor{comment}{//\ Created\ by\ martagfmartins\ on\ 3/6/25.}}
+\DoxyCodeLine{00003\ \textcolor{comment}{//}}
+\DoxyCodeLine{00004\ }
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#ifndef\ ROUTEPLANNING\_H}}
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#define\ ROUTEPLANNING\_H}}
+\DoxyCodeLine{00007\ }
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{00010\ \textcolor{preprocessor}{\#include\ <queue>}}
+\DoxyCodeLine{00011\ \textcolor{preprocessor}{\#include\ <unordered\_map>}}
+\DoxyCodeLine{00012\ \textcolor{preprocessor}{\#include\ <limits>}}
+\DoxyCodeLine{00013\ \textcolor{preprocessor}{\#include\ "{}Graph.h"{}}}
+\DoxyCodeLine{00014\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#include\ <unordered\_set>}}
+\DoxyCodeLine{00016\ \textcolor{keyword}{using\ namespace\ }std;}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{keyword}{class\ }RoutePlanning\ \{}
+\DoxyCodeLine{00019\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ RoutePlanning(\mbox{\hyperlink{class_graph}{Graph<string>}}\&\ graph);}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ vector<string>\ dijkstra(\textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\&\ sourceLocation,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\&\ destinationLocation,\ \textcolor{keywordtype}{double}\&\ totalTravelTime);}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ vector<string>\ dijkstra(\textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\&\ sourceLocation,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\&\ destinationLocation,\ \textcolor{keywordtype}{double}\&\ totalTravelTime,\ \textcolor{keyword}{const}\ unordered\_set<string>\&\ avoidNodes);}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ pair<vector<string>,vector<string>>\ findIndependentRoutes(\textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\&\ sourceLocation,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\&\ destinationLocation,\ \textcolor{keywordtype}{double}\&\ bestRouteTime,\ \textcolor{keywordtype}{double}\&\ alternativeRouteTime);}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ vector<string>\ findRestrictedRoute(\textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\&\ sourceLocation,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\&\ destinationLocation,\ \textcolor{keyword}{const}\ unordered\_set<string>\&\ avoidNodes,\ \textcolor{keyword}{const}\ vector<pair<string,\ string>>\&\ avoidSegments,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\&\ includeNode,\ \textcolor{keywordtype}{double}\&\ totalTravelTime);}
+\DoxyCodeLine{00026\ }
+\DoxyCodeLine{00027\ }
+\DoxyCodeLine{00028\ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_graph}{Graph<string>}}\&\ graph;}
+\DoxyCodeLine{00030\ }
+\DoxyCodeLine{00031\ \};}
+\DoxyCodeLine{00032\ }
+\DoxyCodeLine{00033\ }
+\DoxyCodeLine{00034\ }
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//ROUTEPLANNING\_H}}
+
+\end{DoxyCode}
