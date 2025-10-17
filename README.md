@@ -1,5 +1,9 @@
 # Route Planning System
 
+Course project for Algorithms and Data Structures (L.EIC - FEUP, 2023/2024)
+
+## Project
+
 A C++ route planning application that supports both driving-only and combined driving-walking routes with customizable constraints.
 
 ## Features
